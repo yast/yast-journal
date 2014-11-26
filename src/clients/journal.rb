@@ -1,3 +1,3 @@
-require 'systemd_journal/entries_dialog'
+require 'systemd_journal/dialogs/entries'
 
-SystemdJournal::EntriesDialog.new.run
+SystemdJournal::Dialogs::Entries.new.run
