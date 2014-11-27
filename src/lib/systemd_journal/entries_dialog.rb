@@ -75,12 +75,11 @@ module SystemdJournal
     # named like the event but with the suffix '_callback' is called. If it
     # returns false, the loop is stopped and the whole dialog is closed.
     def event_loop
-      keep_running = true
-      while keep_running
+      loop do
         input = Yast::UI.UserInput
         method = :"#{input}_callback"
         if respond_to?(method, true)
-          keep_running = send(method)
+          break unless send(method)
         else
           log.warn "Method #{method} not implemented"
         end

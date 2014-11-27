@@ -27,7 +27,7 @@ module SystemdJournal
       return nil unless create_dialog
 
       begin
-        case Yast::UI.UserInput.to_sym
+        case Yast::UI.UserInput
         when :cancel
           nil
         when :ok
