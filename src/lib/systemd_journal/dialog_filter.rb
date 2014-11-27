@@ -61,18 +61,19 @@ module SystemdJournal
 
       case @time
       when :current_boot
-        query = query.boot("-0")
+        query.boot = "-0"
       when :previous_boot
-        query = query.boot(-1)
+        query.boot = -1
       when :dates
-        query = query.since(@since).until(@until)
+        query.since = @since
+        query.until = @until
       end
 
       case @source
       when :unit
-        query = query.unit(@unit)
+        query.units << @unit
       when :file
-        query = query.match(@file)
+        query.matches << @file
       end
 
       query

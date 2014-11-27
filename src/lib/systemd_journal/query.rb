@@ -4,16 +4,11 @@ require "systemd_journal/entry"
 Yast.import "SCR"
 
 module SystemdJournal
-  # Wrapper for journalctl usage. REIMPLEMENTATION (AND API CHANGE) PENDING
+  # Wrapper for journalctl usage.
   #
-  # As an experiment, I tried to mimic as closely as possible the API of
-  # ActiveRecord::Relation (familiar to many Ruby developers) and even its
-  # implementation. But the result ended up being a mess.
+  # Check Query::SINGLE_FILTERS and Query::MULTIPLE_FILTERS for a list of the
+  # attributes supported to filter the journal query.
   class Query
-
-    YAST_PATH = Yast::Path.new(".target.bash_output")
-    JOURNALCTL = "journalctl --no-pager -o json"
-    JOURNALCTL_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     SINGLE_FILTERS = {
       boot: "--boot=",
@@ -22,43 +17,26 @@ module SystemdJournal
       until: "--until="
     }
     MULTIPLE_FILTERS = {
-      match: "",
-      unit: "--unit="
+      matches: "",
+      units: "--unit="
     }
 
+    BASH_YAST_PATH = Yast::Path.new(".target.bash_output")
+    JOURNALCTL = "journalctl --no-pager -o json"
+    JOURNALCTL_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+    attr_accessor *SINGLE_FILTERS.keys
+    attr_accessor *MULTIPLE_FILTERS.keys
+
     def initialize
-      # Storage of multiple filters
-      @unit = []
-      @match = []
       # Storage of single filters
-      @priority = @since = @until = @boot = nil
-    end
-
-    # Methods for an ActiveRecord:Relation-like interface
-    #
-
-    def priority(value)
-      dup.priority!(value)
-    end
-
-    def since(value)
-      dup.since!(value)
-    end
-
-    def until(value)
-      dup.until!(value)
-    end
-
-    def boot(value)
-      dup.boot!(value)
-    end
-
-    def match(value)
-      dup.match!(value)
-    end
-
-    def unit(value)
-      dup.unit!(value)
+      SINGLE_FILTERS.keys.each do |attr|
+        send(:"#{attr}=", nil)
+      end
+      # Storage of multiple filters
+      MULTIPLE_FILTERS.keys.each do |attr|
+        send(:"#{attr}=", [])
+      end
     end
 
     # Full journalctl command
@@ -68,7 +46,7 @@ module SystemdJournal
 
     # Calls journalctl and returns an array of SystemdJournal::Entry objects
     def entries
-      command_result = Yast::SCR.Execute(YAST_PATH, command)
+      command_result = Yast::SCR.Execute(BASH_YAST_PATH, command)
       # Ignore lines not representing journal entries, like the following
       # -- Reboot --
       json_entries = command_result["stdout"].each_line.select do |line|
@@ -79,46 +57,22 @@ module SystemdJournal
       end
     end
 
-    SINGLE_FILTERS.keys.each do |name|
-      define_method(:"#{name}!") do |value|
-        instance_variable_set(:"@#{name}", value)
-        self
-      end
-    end
-
-    MULTIPLE_FILTERS.keys.each do |name|
-      define_method(:"#{name}!") do |value|
-        instance_variable_get(:"@#{name}").push(value)
-        self
-      end
-    end
-
-    def dup
-      copy = super
-      MULTIPLE_FILTERS.keys.each do |name|
-        clone = instance_variable_get("@#{name}").dup
-        copy.instance_variable_set("@#{name}", clone)
-      end
-      copy
-    end
-
   private
   
     # List of arguments to the journalctl command
     def cmd_args
       # First, the arguments that can appear only once
       args = SINGLE_FILTERS.map do |name, arg|
-        value = instance_variable_get(:"@#{name}")
-        cmd_arg(arg, value)
+        cmd_arg(arg, send(name))
       end
       # Then, arguments that can be specified several times
       MULTIPLE_FILTERS.each do |name, arg|
         next if arg.empty?
-        values = instance_variable_get(:"@#{name}")
+        values = send(name)
         args.concat(values.map {|value| cmd_arg(arg, value) })
       end
       # And finally, the command can end with several matches
-      args.concat(@match)
+      args.concat(@matches)
 
       args.reject(&:empty?)
     end
