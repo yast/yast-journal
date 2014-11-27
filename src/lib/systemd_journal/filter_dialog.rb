@@ -1,5 +1,6 @@
 require 'yast'
-require 'time'
+require 'systemd_journal/dialog_helpers'
+require 'systemd_journal/dialog_filter'
 
 Yast.import "UI"
 Yast.import "Label"
@@ -11,6 +12,7 @@ module SystemdJournal
 
     include Yast::UIShortcuts
     include Yast::I18n
+    include DialogHelpers
 
     INPUT_WIDTH = 20
 
@@ -20,16 +22,16 @@ module SystemdJournal
 
     # Displays the dialog and returns user's selection of filter options.
     #
-    # @return [Hash] filter options or empty Hash if user cancelled
+    # @return [DialogFilter] nil if user cancelled
     def run
       return nil unless create_dialog
 
       begin
         case Yast::UI.UserInput.to_sym
         when :cancel
-          {}
+          nil
         when :ok
-          widgets_values
+          filter_from_widgets
         else
           raise "Unexpected input #{input}"
         end
@@ -40,26 +42,25 @@ module SystemdJournal
 
   private
 
-    # Translates the value of the widgets to the structure used in the filter
-    # 
-    # @returns [Hash] Hash containing :time, :source and other keys only when
-    #                 they are relevant
-    def widgets_values
-      values = {
-        time: Yast::UI.QueryWidget(Id(:time), :CurrentButton),
-        source: Yast::UI.QueryWidget(Id(:source), :CurrentButton)
-      }
-      if values[:time] == :dates
-        values[:since] = time_from_widgets_of(:since)
-        values[:until] = time_from_widgets_of(:until)
+    # Translates the value of the widgets to a new DialogFilter object
+    def filter_from_widgets
+      filter = @filter.dup
+      filter.time = Yast::UI.QueryWidget(Id(:time), :CurrentButton)
+      filter.source = Yast::UI.QueryWidget(Id(:source), :CurrentButton)
+
+      if filter.time == :dates
+        filter.since = time_from_widgets_for(:since)
+        filter.until = time_from_widgets_for(:until)
       end
-      case values[:source]
+
+      case filter.source
       when :unit
-        values[:unit] = Yast::UI.QueryWidget(Id(:unit_field), :Value)
+        filter.unit = Yast::UI.QueryWidget(Id(:unit_field), :Value)
       when :file
-        values[:file] = Yast::UI.QueryWidget(Id(:file_field), :Value)
+        filter.file = Yast::UI.QueryWidget(Id(:file_field), :Value)
       end
-      values
+
+      filter
     end
 
     # Draws the dialog
@@ -97,99 +98,41 @@ module SystemdJournal
 
     # Array of radio buttons to select the time frame
     def time_buttons
-
-      # For each option, we'll need an id, a label and, optionally,
-      # some extra widgets
       options = [
         [:current_boot, _("Since system's boot")],
         [:previous_boot, _("On previous boot")],
         [:dates, _("Between these dates"), HSpacing(1), *dates_widgets]
       ]
-          
-      options.map do |value, label, *widgets|
-        Left(
-          HBox(
-            RadioButton(Id(value), label, @filter[:time] == value),
-            *widgets
-          )
-        )
-      end
+      radio_buttons_for(options, value: @filter.time)
     end
 
     # Array of radio buttons to select the source
     def source_buttons
-
-      # For each option, we'll need an id, a label and, optionally,
-      # some extra widgets
       options = [
         [:all, _("Any source")],     
         [:unit, _("This systemd unit"), HSpacing(1), unit_widget],
         [:file, _("This file (executable or device)"), HSpacing(1), file_widget]
       ]
-
-      options.map do |value, label, *widgets|
-        Left(
-          HBox(
-            RadioButton(Id(value), label, @filter[:source] == value),
-            *widgets
-          )
-        )
-      end
+      radio_buttons_for(options, value: @filter.source)
     end
 
     # Array of widgets for selecting date/time thresholds
     def dates_widgets
       [
-        *time_widgets_for(:since),
+        *time_widgets_for(:since, @filter.since),
         Label("-"),
-        *time_widgets_for(:until)
+        *time_widgets_for(:until, @filter.until)
       ]
     end
 
-    # Array of widgets representing one if the time fields on @filter
-    # (:since or :until), the result depends on the used UI (not all widgets are
-    # available in all interfaces)
-    def time_widgets_for(field)
-      date = @filter[field].strftime("%Y-%m-%d")
-      time = @filter[field].strftime("%H:%M:%S")
-      widgets = []
-
-      # DateField widget is not available in ncurses interface
-      if Yast::UI.HasSpecialWidget(:DateField)
-        widgets << DateField(Id(:"#{field}_date"), "", date)
-      else
-        widgets << MinWidth(11, InputField(Id(:"#{field}_date"), "", date))
-      end
-      # TimeField widget is not available in ncurses interface
-      if Yast::UI.HasSpecialWidget(:TimeField)
-        widgets << TimeField(Id(:"#{field}_time"), "", time)
-      else
-        widgets << MinWidth(9, InputField(Id(:"#{field}_time"), "", time))
-      end
-      widgets
-    end
-
-    # Reads the widgets representing one of the time fields from @filter.
-    #
-    # @returns [Time] Value specified by the user
-    def time_from_widgets_of(field)
-      Time.parse(
-        Yast::UI.QueryWidget(Id(:"#{field}_date"), :Value) +
-        " " +
-        Yast::UI.QueryWidget(Id(:"#{field}_time"), :Value)
-      )
-    end
-
-    # Widget representing @filter[:unit]
+    # Widget to set the unit
     def unit_widget
-      current = @filter.fetch(:unit, "")
-      MinWidth(INPUT_WIDTH, InputField(Id(:unit_field), "", current))
+      MinWidth(INPUT_WIDTH, InputField(Id(:unit_field), "", @filter.unit))
     end
 
-    # Widget representing @filter[:file]
+    # Widget to set the file
     def file_widget
-      current = @filter.fetch(:file, "")
-      MinWidth(INPUT_WIDTH, InputField(Id(:file_field), "", current))
+      MinWidth(INPUT_WIDTH, InputField(Id(:file_field), "", @filter.file))
     end
   end
 end

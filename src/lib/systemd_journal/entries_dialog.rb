@@ -1,6 +1,6 @@
 require 'yast'
+require 'systemd_journal/dialog_filter'
 require 'systemd_journal/filter_dialog'
-require 'systemd_journal/query'
 
 Yast.import "UI"
 Yast.import "Label"
@@ -13,18 +13,10 @@ module SystemdJournal
     include Yast::I18n
     include Yast::Logger
 
-    # FIXME: Do we have i18n support for time formats?
-    TIME_FORMAT = "%b %d %H:%M:%S"
-
     def initialize
       textdomain "systemd_journal"
 
-      @filter = {
-        time: :current_boot,
-        source: :all,
-        since: Time.now - 24*60*60,
-        until: Time.now
-      }
+      @filter = DialogFilter.new
       @search = ""
       read_journal_entries
     end
@@ -57,8 +49,8 @@ module SystemdJournal
               InputField(Id(:search), Opt(:hstretch, :notify), "", @search)
             )
           ),
-          Left(ReplacePoint(Id(:time_label), Label(time_description))),
-          Left(ReplacePoint(Id(:source_label), Label(source_description))),
+          Left(ReplacePoint(Id(:time_widget), time_label)),
+          Left(ReplacePoint(Id(:source_widget), source_label)),
           VSpacing(0.3),
           # Log entries
           table,
@@ -95,36 +87,6 @@ module SystemdJournal
       end
     end
 
-    def source_description
-      case @filter[:source]
-      when :all
-        _(" - From any source")
-      when :unit
-        _(" - For the unit %s") % @filter[:unit]
-      when :file
-        _(" - For the file %s") % @filter[:file]
-      else
-        raise "Unknown option for source filter"
-      end
-    end
-
-    def time_description
-      case @filter[:time]
-      when :current_boot
-        _(" - Since system's boot")
-      when :previous_boot
-        _(" - From previous boot")
-      when :dates
-        dates = {
-          since: @filter[:since].strftime(TIME_FORMAT),
-          until: @filter[:until].strftime(TIME_FORMAT)
-        }
-        _(" - Between %{since} and %{until}") % dates
-      else
-        raise "Unknown option for time filter"
-      end
-    end
-
     # Table widget (plus wrappers) to display log entries
     def table
       Table(
@@ -143,7 +105,7 @@ module SystemdJournal
       # Reduce it to an array with only the visible fields
       entries_fields = @journal_entries.map do |entry|
         [
-          entry.timestamp.strftime(TIME_FORMAT),
+          entry.timestamp.strftime(DialogFilter::TIME_FORMAT),
           entry.process_name,
           entry.message
         ]
@@ -156,9 +118,17 @@ module SystemdJournal
       entries_fields.map {|fields| Item(*fields) }
     end
 
+    def source_label
+      Label(@filter.source_description)
+    end
+
+    def time_label
+      Label(@filter.time_description)
+    end
+
     def redraw_filter
-      Yast::UI.ReplaceWidget(Id(:time_label), Label(time_description))
-      Yast::UI.ReplaceWidget(Id(:source_label), Label(source_description))
+      Yast::UI.ReplaceWidget(Id(:time_widget), time_label)
+      Yast::UI.ReplaceWidget(Id(:source_widget), source_label)
     end
 
     def redraw_table
@@ -198,8 +168,12 @@ module SystemdJournal
     # @see SystemdJournal::FilterDialog
     def read_filter
       filter = FilterDialog.new(@filter).run
-      @filter.merge!(filter)
-      log.info "FilterDialog returned #{filter}. New filter is #{@filter}."
+      if filter
+        @filter = filter
+        log.info "New filter is #{@filter}."
+      else
+        log.info "FilterDialog returned nil. Filter is still #{@filter}."
+      end
     end
 
     # Gets the new search string from the interface
@@ -210,24 +184,7 @@ module SystemdJournal
 
     # Reads the journal entries from the system
     def read_journal_entries
-      query = SystemdJournal::Query.new
-
-      case @filter[:time]
-      when :current_boot
-        query = query.boot("-0")
-      when :previous_boot
-        query = query.boot(-1)
-      when :dates
-        query = query.since(@filter[:since]).until(@filter[:until])
-      end
-
-      case @filter[:source]
-      when :unit
-        query = query.unit(@filter[:unit])
-      when :file
-        query = query.match(@filter[:file])
-      end
-
+      query = @filter.to_query
       @journal_entries = query.entries
       log.info "Command '#{query.command}' returned #{@journal_entries.size} entries."
     end
