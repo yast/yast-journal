@@ -1,25 +1,8 @@
 require 'time'
 
 module SystemdJournal
-  # Commodity methods for the dialogs
-  module DialogHelpers
-
-    # Array of radio buttons
-    #
-    # @param options [Array] Array of options. Every option is an array where the
-    #                       first element represents the id, the second the label
-    #                       and the rest elements are optional widgets.
-    # @param value [Object] Id of the currently selected radio button.
-    def radio_buttons_for(options, value: nil)
-      options.map do |id, label, *widgets|
-        Left(
-          HBox(
-            RadioButton(Id(id), label, value == id),
-            *widgets
-          )
-        )
-      end
-    end
+  # Commodity methods for dealing with time fields in the dialogs
+  module TimeHelpers
 
     # Array of widgets representing one time field.
     #

@@ -1,6 +1,6 @@
 require 'yast'
-require 'systemd_journal/dialog_filter'
-require 'systemd_journal/filter_dialog'
+require 'systemd_journal/query_presenter'
+require 'systemd_journal/query_dialog'
 
 Yast.import "UI"
 Yast.import "Label"
@@ -16,7 +16,7 @@ module SystemdJournal
     def initialize
       textdomain "systemd_journal"
 
-      @filter = DialogFilter.new
+      @query = QueryPresenter.new
       @search = ""
       read_journal_entries
     end
@@ -49,8 +49,7 @@ module SystemdJournal
               InputField(Id(:search), Opt(:hstretch, :notify), "", @search)
             )
           ),
-          Left(ReplacePoint(Id(:time_widget), time_label)),
-          Left(ReplacePoint(Id(:source_widget), source_label)),
+          ReplacePoint(Id(:query), query_description),
           VSpacing(0.3),
           # Log entries
           table,
@@ -104,7 +103,7 @@ module SystemdJournal
       # Reduce it to an array with only the visible fields
       entries_fields = @journal_entries.map do |entry|
         [
-          entry.timestamp.strftime(DialogFilter::TIME_FORMAT),
+          entry.timestamp.strftime(QueryPresenter::TIME_FORMAT),
           entry.process_name,
           entry.message
         ]
@@ -117,17 +116,15 @@ module SystemdJournal
       entries_fields.map {|fields| Item(*fields) }
     end
 
-    def source_label
-      Label(@filter.source_description)
+    def query_description
+      VBox(
+        Left(Label(" - #{@query.interval_description}")),
+        Left(Label(" - #{@query.filters_description}"))
+      )
     end
 
-    def time_label
-      Label(@filter.time_description)
-    end
-
-    def redraw_filter
-      Yast::UI.ReplaceWidget(Id(:time_widget), time_label)
-      Yast::UI.ReplaceWidget(Id(:source_widget), source_label)
+    def redraw_query
+      Yast::UI.ReplaceWidget(Id(:query), query_description)
     end
 
     def redraw_table
@@ -141,9 +138,9 @@ module SystemdJournal
 
     # Event callback for the 'change filter' button.
     def filter_callback
-      read_filter
+      read_query
       read_journal_entries
-      redraw_filter
+      redraw_query
       redraw_table
       true
     end
@@ -162,16 +159,16 @@ module SystemdJournal
       true
     end
 
-    # Asks the user the new filter options using SystemdJournal::FilterDialog.
+    # Asks the user the new query options using SystemdJournal::QueryDialog.
     #
-    # @see SystemdJournal::FilterDialog
-    def read_filter
-      filter = FilterDialog.new(@filter).run
-      if filter
-        @filter = filter
-        log.info "New filter is #{@filter}."
+    # @see SystemdJournal::QueryDialog
+    def read_query
+      query = QueryDialog.new(@query).run
+      if query
+        @query = query
+        log.info "New query is #{@query}."
       else
-        log.info "FilterDialog returned nil. Filter is still #{@filter}."
+        log.info "QueryDialog returned nil. Query is still #{@query}."
       end
     end
 
@@ -183,9 +180,8 @@ module SystemdJournal
 
     # Reads the journal entries from the system
     def read_journal_entries
-      query = @filter.to_query
-      @journal_entries = query.entries
-      log.info "Command '#{query.command}' returned #{@journal_entries.size} entries."
+      @journal_entries = @query.entries
+      log.info "Call to journalctl with '#{@query.journalctl_args}' returned #{@journal_entries.size} entries."
     end
   end
 end
