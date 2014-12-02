@@ -1,137 +1,89 @@
-require "yast"
-require "systemd_journal/entry"
-
-Yast.import "SCR"
+require 'systemd_journal/entry'
 
 module SystemdJournal
-  # Wrapper for journalctl usage. REIMPLEMENTATION (AND API CHANGE) PENDING
-  #
-  # As an experiment, I tried to mimic as closely as possible the API of
-  # ActiveRecord::Relation (familiar to many Ruby developers) and even its
-  # implementation. But the result ended up being a mess.
+  # Wrapper for journalctl usage.
   class Query
 
-    YAST_PATH = Yast::Path.new(".target.bash_output")
-    JOURNALCTL = "journalctl --no-pager -o json"
     JOURNALCTL_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-    SINGLE_FILTERS = {
-      boot: "--boot=",
-      priority: "--priority=",
-      since: "--since=",
-      until: "--until="
-    }
-    MULTIPLE_FILTERS = {
-      match: "",
-      unit: "--unit="
-    }
+    FILTERS = [
+      {name: :priority, arg: "--priority="},
+      {name: :units, arg: "--unit="},
+      {name: :matches}
+    ]
 
-    def initialize
-      # Storage of multiple filters
-      @unit = []
-      @match = []
-      # Storage of single filters
-      @priority = @since = @until = @boot = nil
-    end
+    attr_reader :interval, :filters, :journalctl_args
 
-    # Methods for an ActiveRecord:Relation-like interface
+    # Creates a new query based on the time interval and some additional filters
     #
-
-    def priority(value)
-      dup.priority!(value)
+    # @param interval [Array,Hash,#to_s] Time interval, can take several forms:
+    #   * Array of two elements with starting and ending time
+    #   * Hash with two possible keys :since and :until
+    #   * An scalar value to be passed to the --boot argument of journalctl
+    #   In the first two cases, the values can be Time objects or strings of
+    #   any format accepted by journalctl for --until and --since
+    # @param filters [Hash] valid keys are :priority, :units and :matches, the
+    #   values are strings or array of strings with the format accepted by the
+    #   corresponding journalctl argument. If the value is an Array, the
+    #   argument will be repeated as many times as needed.
+    def initialize(interval: nil, filters: {})
+      @interval = interval
+      @filters = filters
     end
 
-    def since(value)
-      dup.since!(value)
+    # String with a list of arguments for journalctl
+    def journalctl_args
+      return @journalctl_args if @journalctl_args
+
+      args = []
+
+      # If a interval was specified, translate it to journalctl arguments
+      if @interval
+        case @interval
+        when Array
+          args << time_argument(:since, interval[0])
+          args << time_argument(:until, interval[1])
+        when Hash
+          args << time_argument(:since, interval[:since])
+          args << time_argument(:until, interval[:until])
+        else
+          args << "--boot=#{@interval}"
+        end
+      end
+
+      # Add filters
+      FILTERS.each do |filter|
+        # Make sure it's an array and remove nils
+        values = [@filters[filter[:name]]].flatten.compact
+        values.each do |value|
+          args << "#{filter[:arg]}#{value}"
+        end
+      end
+      
+      @journalctl_args = args.join(" ")
     end
 
-    def until(value)
-      dup.until!(value)
-    end
-
-    def boot(value)
-      dup.boot!(value)
-    end
-
-    def match(value)
-      dup.match!(value)
-    end
-
-    def unit(value)
-      dup.unit!(value)
-    end
-
-    # Full journalctl command
-    def command
-      command = "#{JOURNALCTL} #{cmd_args.join(' ')}"
-    end
-
-    # Calls journalctl and returns an array of SystemdJournal::Entry objects
+    # Calls journalctl and returns an Array of Entry objects
     def entries
-      command_result = Yast::SCR.Execute(YAST_PATH, command)
-      # Ignore lines not representing journal entries, like the following
-      # -- Reboot --
-      json_entries = command_result["stdout"].each_line.select do |line|
-        line.start_with?("{")
-      end
-      json_entries.map do |json|
-        Entry.new(json)
-      end
+      Entry.all(journalctl_args)
     end
 
-    SINGLE_FILTERS.keys.each do |name|
-      define_method(:"#{name}!") do |value|
-        instance_variable_set(:"@#{name}", value)
-        self
-      end
-    end
-
-    MULTIPLE_FILTERS.keys.each do |name|
-      define_method(:"#{name}!") do |value|
-        instance_variable_get(:"@#{name}").push(value)
-        self
-      end
-    end
-
-    def dup
-      copy = super
-      MULTIPLE_FILTERS.keys.each do |name|
-        clone = instance_variable_get("@#{name}").dup
-        copy.instance_variable_set("@#{name}", clone)
-      end
-      copy
+    def to_s
+      "<interval: #{@interval}, filters: #{@filters}>"
     end
 
   private
-  
-    # List of arguments to the journalctl command
-    def cmd_args
-      # First, the arguments that can appear only once
-      args = SINGLE_FILTERS.map do |name, arg|
-        value = instance_variable_get(:"@#{name}")
-        cmd_arg(arg, value)
-      end
-      # Then, arguments that can be specified several times
-      MULTIPLE_FILTERS.each do |name, arg|
-        next if arg.empty?
-        values = instance_variable_get(:"@#{name}")
-        args.concat(values.map {|value| cmd_arg(arg, value) })
-      end
-      # And finally, the command can end with several matches
-      args.concat(@match)
 
-      args.reject(&:empty?)
-    end
-
-    # Argument to the journalctl command
-    def cmd_arg(arg, value)
-      return "" if value.nil?
-
+    # String representation of a time-based journalctl argument
+    # 
+    # @param arg [#to_s] name of the argument
+    # @param value [#strftime,#to_s]
+    def time_argument(arg, value)
       if value.respond_to?(:strftime)
         value = "\"#{value.strftime(JOURNALCTL_TIME_FORMAT)}\""
       end
-
-      "#{arg}#{value}"
+      "--#{arg}=#{value}"
     end
   end
 end
+

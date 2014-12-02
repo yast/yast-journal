@@ -1,6 +1,6 @@
 require 'yast'
-require 'systemd_journal/filter_dialog'
-require 'systemd_journal/query'
+require 'systemd_journal/query_presenter'
+require 'systemd_journal/query_dialog'
 
 Yast.import "UI"
 Yast.import "Label"
@@ -13,18 +13,10 @@ module SystemdJournal
     include Yast::I18n
     include Yast::Logger
 
-    # FIXME: Do we have i18n support for time formats?
-    TIME_FORMAT = "%b %d %H:%M:%S"
-
     def initialize
       textdomain "systemd_journal"
 
-      @filter = {
-        time: :current_boot,
-        source: :all,
-        since: Time.now - 24*60*60,
-        until: Time.now
-      }
+      @query = QueryPresenter.new
       @search = ""
       read_journal_entries
     end
@@ -57,8 +49,7 @@ module SystemdJournal
               InputField(Id(:search), Opt(:hstretch, :notify), "", @search)
             )
           ),
-          Left(ReplacePoint(Id(:time_label), Label(time_description))),
-          Left(ReplacePoint(Id(:source_label), Label(source_description))),
+          ReplacePoint(Id(:query), query_description),
           VSpacing(0.3),
           # Log entries
           table,
@@ -83,45 +74,14 @@ module SystemdJournal
     # named like the event but with the suffix '_callback' is called. If it
     # returns false, the loop is stopped and the whole dialog is closed.
     def event_loop
-      keep_running = true
-      while keep_running
+      loop do
         input = Yast::UI.UserInput
         method = :"#{input}_callback"
         if respond_to?(method, true)
-          keep_running = send(method)
+          break unless send(method)
         else
           log.warn "Method #{method} not implemented"
         end
-      end
-    end
-
-    def source_description
-      case @filter[:source]
-      when :all
-        _(" - From any source")
-      when :unit
-        _(" - For the unit %s") % @filter[:unit]
-      when :file
-        _(" - For the file %s") % @filter[:file]
-      else
-        raise "Unknown option for source filter"
-      end
-    end
-
-    def time_description
-      case @filter[:time]
-      when :current_boot
-        _(" - Since system's boot")
-      when :previous_boot
-        _(" - From previous boot")
-      when :dates
-        dates = {
-          since: @filter[:since].strftime(TIME_FORMAT),
-          until: @filter[:until].strftime(TIME_FORMAT)
-        }
-        _(" - Between %{since} and %{until}") % dates
-      else
-        raise "Unknown option for time filter"
       end
     end
 
@@ -143,7 +103,7 @@ module SystemdJournal
       # Reduce it to an array with only the visible fields
       entries_fields = @journal_entries.map do |entry|
         [
-          entry.timestamp.strftime(TIME_FORMAT),
+          entry.timestamp.strftime(QueryPresenter::TIME_FORMAT),
           entry.process_name,
           entry.message
         ]
@@ -156,9 +116,15 @@ module SystemdJournal
       entries_fields.map {|fields| Item(*fields) }
     end
 
-    def redraw_filter
-      Yast::UI.ReplaceWidget(Id(:time_label), Label(time_description))
-      Yast::UI.ReplaceWidget(Id(:source_label), Label(source_description))
+    def query_description
+      VBox(
+        Left(Label(" - #{@query.interval_description}")),
+        Left(Label(" - #{@query.filters_description}"))
+      )
+    end
+
+    def redraw_query
+      Yast::UI.ReplaceWidget(Id(:query), query_description)
     end
 
     def redraw_table
@@ -172,9 +138,9 @@ module SystemdJournal
 
     # Event callback for the 'change filter' button.
     def filter_callback
-      read_filter
+      read_query
       read_journal_entries
-      redraw_filter
+      redraw_query
       redraw_table
       true
     end
@@ -193,13 +159,17 @@ module SystemdJournal
       true
     end
 
-    # Asks the user the new filter options using SystemdJournal::FilterDialog.
+    # Asks the user the new query options using SystemdJournal::QueryDialog.
     #
-    # @see SystemdJournal::FilterDialog
-    def read_filter
-      filter = FilterDialog.new(@filter).run
-      @filter.merge!(filter)
-      log.info "FilterDialog returned #{filter}. New filter is #{@filter}."
+    # @see SystemdJournal::QueryDialog
+    def read_query
+      query = QueryDialog.new(@query).run
+      if query
+        @query = query
+        log.info "New query is #{@query}."
+      else
+        log.info "QueryDialog returned nil. Query is still #{@query}."
+      end
     end
 
     # Gets the new search string from the interface
@@ -210,26 +180,8 @@ module SystemdJournal
 
     # Reads the journal entries from the system
     def read_journal_entries
-      query = SystemdJournal::Query.new
-
-      case @filter[:time]
-      when :current_boot
-        query = query.boot("-0")
-      when :previous_boot
-        query = query.boot(-1)
-      when :dates
-        query = query.since(@filter[:since]).until(@filter[:until])
-      end
-
-      case @filter[:source]
-      when :unit
-        query = query.unit(@filter[:unit])
-      when :file
-        query = query.match(@filter[:file])
-      end
-
-      @journal_entries = query.entries
-      log.info "Command '#{query.command}' returned #{@journal_entries.size} entries."
+      @journal_entries = @query.entries
+      log.info "Call to journalctl with '#{@query.journalctl_args}' returned #{@journal_entries.size} entries."
     end
   end
 end
