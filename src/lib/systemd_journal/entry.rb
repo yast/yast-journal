@@ -1,8 +1,6 @@
 require "json"
 require "yast"
 
-Yast.import "SCR"
-
 module SystemdJournal
   # An entry in the systemd journal
   class Entry
