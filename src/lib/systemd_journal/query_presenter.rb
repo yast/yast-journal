@@ -17,6 +17,7 @@
 #  you may find current contact information at www.suse.com
 
 require 'systemd_journal/query'
+require 'systemd_journal/entry_presenter'
 require 'delegate'
 
 module SystemdJournal
@@ -32,6 +33,18 @@ module SystemdJournal
     def initialize(interval: "0", filters: {})
       query = Query.new(interval: interval, filters: filters)
       __setobj__(query)
+    end
+
+    # Original query
+    def query
+      __getobj__
+    end
+
+    # Decorated entries
+    #
+    # @return [Array<EntryPresenter]
+    def entries
+      query.entries.map {|entry| EntryPresenter.new(entry) }
     end
 
     # User readable description of the current filters
@@ -110,6 +123,16 @@ module SystemdJournal
         }
       ]
     end
+
+    # Fields to display for listing the entries
+    #
+    # @return [Array<Hash>] for each column a :label and a :method is provided
+    def columns
+      [
+        {label: _("Time"), method: :formatted_time},
+        {label: _("Source"), method: :source},
+        {label: _("Message"), method: :message}
+      ]
+    end
   end
 end
-

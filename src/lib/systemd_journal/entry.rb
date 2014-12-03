@@ -23,8 +23,8 @@ module SystemdJournal
   # An entry in the systemd journal
   class Entry
 
-    attr_reader :raw, :timestamp, :uid, :gid, :pid, :process_name,
-      :cmdline, :unit, :machine_id, :hostname, :message
+    attr_reader :raw, :timestamp, :uid, :gid, :pid, :process_name, :cmdline,
+      :syslog_id, :unit, :machine_id, :hostname, :message
 
     BASH_YAST_PATH = Yast::Path.new(".target.bash_output")
     JOURNALCTL = "journalctl --no-pager -o json"
@@ -36,6 +36,7 @@ module SystemdJournal
       @pid = @raw["_PID"]
       @process_name = @raw["_COMM"]
       @cmdline = @raw["_CMDLINE"]
+      @syslog_id = @raw["SYSLOG_IDENTIFIER"]
       @unit = @raw["_SYSTEMD_UNIT"]
       @machine_id = @raw["_MACHINE_ID"]
       @hostname = @raw["_HOSTNAME"]

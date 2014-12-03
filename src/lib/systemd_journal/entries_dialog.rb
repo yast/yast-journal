@@ -105,14 +105,12 @@ module SystemdJournal
 
     # Table widget (plus wrappers) to display log entries
     def table
+      headers = @query.columns.map {|c| c[:label] }
+
       Table(
         Id(:table),
         Opt(:keepSorting),
-        Header(
-          _("Time"),
-          _("Process"),
-          _("Message"),
-        ),
+        Header(*headers),
         table_items
       )
     end
@@ -120,11 +118,7 @@ module SystemdJournal
     def table_items
       # Reduce it to an array with only the visible fields
       entries_fields = @journal_entries.map do |entry|
-        [
-          entry.timestamp.strftime(QueryPresenter::TIME_FORMAT),
-          entry.process_name,
-          entry.message
-        ]
+        @query.columns.map {|c| entry.send(c[:method]) }
       end
       # Grep for entries matching @search in any visible field
       entries_fields.select! do |fields|
