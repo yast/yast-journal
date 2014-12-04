@@ -150,10 +150,11 @@ module SystemdJournal
 
     # Event callback for the 'change filter' button.
     def filter_callback
-      read_query
-      read_journal_entries
-      redraw_query
-      redraw_table
+      if read_query
+        read_journal_entries
+        redraw_query
+        redraw_table
+      end
       true
     end
 
@@ -174,13 +175,17 @@ module SystemdJournal
     # Asks the user the new query options using SystemdJournal::QueryDialog.
     #
     # @see SystemdJournal::QueryDialog
+    #
+    # @return [Boolean] true whether the query has changed
     def read_query
       query = QueryDialog.new(@query).run
       if query
         @query = query
         log.info "New query is #{@query}."
+        true
       else
         log.info "QueryDialog returned nil. Query is still #{@query}."
+        false
       end
     end
 
@@ -192,8 +197,9 @@ module SystemdJournal
 
     # Reads the journal entries from the system
     def read_journal_entries
+      log.info "Calling journalctl with '#{@query.journalctl_args}'"
       @journal_entries = @query.entries
-      log.info "Call to journalctl with '#{@query.journalctl_args}' returned #{@journal_entries.size} entries."
+      log.info "Call to journalctl returned #{@journal_entries.size} entries."
     end
   end
 end
