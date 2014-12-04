@@ -7,7 +7,7 @@ X-KDE-HasReadOnlyMode=true
 X-KDE-Library=yast2
 X-SuSE-YaST-Call=journal
 
-X-SuSE-YaST-Group=System
+X-SuSE-YaST-Group=Misc
 X-SuSE-YaST-Argument=
 X-SuSE-YaST-RootOnly=true
 X-SuSE-YaST-AutoInst=
