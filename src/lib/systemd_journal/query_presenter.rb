@@ -30,8 +30,15 @@ module SystemdJournal
     # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 
-    def initialize(interval: "0", filters: {})
-      query = Query.new(interval: interval, filters: filters)
+    def initialize(args = {})
+      # Redefine default values
+      query_args = {
+        interval: QueryPresenter.default_interval,
+        filters: QueryPresenter.default_filters
+      }
+      query_args.merge!(args)
+
+      query = Query.new(query_args)
       __setobj__(query)
     end
 
@@ -89,10 +96,32 @@ module SystemdJournal
     #                 :value and :label
     def self.intervals
       [
+        {value: Hash, label: _("Between these dates")},
         {value: "0", label: _("Since system's boot")},
-        {value: "-1", label: _("From previous boot")},
-        {value: Hash, label: _("Between these dates")}
+        {value: "-1", label: _("From previous boot")}
       ]
+    end
+
+    # Default value for interval[:since]
+    def self.default_since
+      # 24 hours ago
+      Time.now - 24*60*60
+    end
+
+    # Default value for interval[:until]
+    def self.default_until
+      # Current time
+      Time.now
+    end
+
+    # Default value for interval
+    def self.default_interval
+      { since: default_since, until: default_until }
+    end
+
+    # Default value for filters
+    def self.default_filters
+      {}
     end
 
     # Possible filters for a QueryPresenter object to be used in forms

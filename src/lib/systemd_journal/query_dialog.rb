@@ -142,21 +142,21 @@ module SystemdJournal
       ]
     end
 
-    # Initial value for the :since widget, defaults to 24 hours ago
+    # Initial value for the :since widget
     def since_value
       if @query.interval.is_a?(Hash)
         @query.interval[:since]
       else
-        Time.now - 24*60*60
+        QueryPresenter.default_since
       end
     end
 
-    # Initial value for the :until widget, defaults to the current time
+    # Initial value for the :until widget
     def until_value
       if @query.interval.is_a?(Hash)
         @query.interval[:until]
       else
-        Time.now
+        QueryPresenter.default_until
       end
     end
 
