@@ -20,30 +20,28 @@
 require_relative "spec_helper"
 require "systemd_journal/entry_presenter"
 
-module SystemdJournal
-  describe EntryPresenter do
-    let(:entry) { Entry.new(json_for("nfs")) }
+describe SystemdJournal::EntryPresenter do
+  let(:entry) { SystemdJournal::Entry.new(json_for("nfs")) }
 
-    describe "delegation" do
-      subject { EntryPresenter.new(entry) }
+  describe "delegation" do
+    subject { SystemdJournal::EntryPresenter.new(entry) }
 
-      # Just some examples
-      [:raw, :uid, :timestamp, :message].each do |method|
-        it "delegates #{method} to its entry" do
-          expect(entry).to receive(method).and_return("something")
-          expect(subject.send(method)).to eq("something")
-        end
+    # Just some examples
+    [:raw, :uid, :timestamp, :message].each do |method|
+      it "delegates #{method} to its entry" do
+        expect(entry).to receive(method).and_return("something")
+        expect(subject.send(method)).to eq("something")
       end
     end
+  end
 
-    describe "#formatted_time" do
-      subject { EntryPresenter.new(entry).formatted_time }
+  describe "#formatted_time" do
+    subject { SystemdJournal::EntryPresenter.new(entry).formatted_time }
 
-      it "returns a string including the time" do
-        time = entry.timestamp.strftime("%H:%M:%S")
-        expect(subject).to be_a(String)
-        expect(subject).to match(time)
-      end
+    it "returns a string including the time" do
+      time = entry.timestamp.strftime("%H:%M:%S")
+      expect(subject).to be_a(String)
+      expect(subject).to match(time)
     end
   end
 end

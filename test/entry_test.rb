@@ -20,123 +20,121 @@
 require_relative "spec_helper"
 require "systemd_journal/entry"
 
-module SystemdJournal
-  describe Entry do
+describe SystemdJournal::Entry do
 
-    describe ".all" do
-      subject { Entry.all(args) }
-      let(:command) { "LANG=C journalctl --no-pager -o json" }
+  describe ".all" do
+    subject { SystemdJournal::Entry.all(args) }
+    let(:command) { "LANG=C journalctl --no-pager -o json" }
 
-      describe "journalctl invocation" do
-        context "when called with no additional arguments" do
-          let(:args) { nil }
+    describe "journalctl invocation" do
+      context "when called with no additional arguments" do
+        let(:args) { nil }
 
-          it "invokes journalctl without filters" do
-            expect_journalctl(command)
-            subject
-          end
-        end
-
-        context "when called with additional arguments" do
-          let(:args) { "-b" }
-
-          it "passes the arguments to journalctl" do
-            expect_journalctl("#{command} -b")
-            subject
-          end
+        it "invokes journalctl without filters" do
+          expect_journalctl(command)
+          subject
         end
       end
 
-      describe "journalctl parsing" do
-        # Arguments are not relevant, we are going to stub the call
-        let(:args) { nil }
-        # Stub journalctl call
-        before do
-          allow(Yast::SCR).to receive(:Execute).
-            with(BASH_SCR_PATH, /#{command}/).
-            and_return(result)
-        end
+      context "when called with additional arguments" do
+        let(:args) { "-b" }
 
-        context "when journalctl reports 'Failed to determine timestamp'" do
-          let(:result) {
-            journalctl_error("Failed to determine timestamp: Cannot assign")
-          }
-
-          it "returns an empty array" do
-            expect(subject).to eq([])
-          end
-        end
-
-        context "when journalctl reports 'Failed to get realtime timestamp'" do
-          let(:result) {
-            journalctl_error("Failed to get realtime timestamp: Cannot assign")
-          }
-
-          it "returns an empty array" do
-            expect(subject).to eq([])
-          end
-        end
-
-        context "when journalctl reports an unexpected error" do
-          let(:result) {
-            journalctl_error("There are always more ways to crash")
-          }
-
-          it "raises RuntimeError" do
-            expect{subject}.to raise_error(RuntimeError)
-          end
-        end
-
-        context "when journalctl works" do
-          let(:result) { journalctl_result }
-
-          it "ignores journalctl markers" do
-            expect(subject.size).to eq(7)
-          end
-
-          it "returns an array of Entry objects" do
-            expect(subject.all? {|e| e.is_a?(Entry)}).to eql(true)
-          end
-
-          it "honours the entries order" do
-            names = [ "nfs", "wickedd-dhcp4", "wickedd-dhcp6", nil,
-                      "systemd-journal", "systemd-journal", nil ]
-            expect(subject.map(&:process_name)).to eq(names)
-          end
+        it "passes the arguments to journalctl" do
+          expect_journalctl("#{command} -b")
+          subject
         end
       end
     end
 
-    describe "#initialize" do
-      subject { Entry.new(json) }
-      let(:json) { json_for(entry) }
-      # Any entry will work for most general tests
+    describe "journalctl parsing" do
+      # Arguments are not relevant, we are going to stub the call
+      let(:args) { nil }
+      # Stub journalctl call
+      before do
+        allow(Yast::SCR).to receive(:Execute).
+          with(BASH_SCR_PATH, /#{command}/).
+          and_return(result)
+      end
+
+      context "when journalctl reports 'Failed to determine timestamp'" do
+        let(:result) {
+          journalctl_error("Failed to determine timestamp: Cannot assign")
+        }
+
+        it "returns an empty array" do
+          expect(subject).to eq([])
+        end
+      end
+
+      context "when journalctl reports 'Failed to get realtime timestamp'" do
+        let(:result) {
+          journalctl_error("Failed to get realtime timestamp: Cannot assign")
+        }
+
+        it "returns an empty array" do
+          expect(subject).to eq([])
+        end
+      end
+
+      context "when journalctl reports an unexpected error" do
+        let(:result) {
+          journalctl_error("There are always more ways to crash")
+        }
+
+        it "raises RuntimeError" do
+          expect{subject}.to raise_error(RuntimeError)
+        end
+      end
+
+      context "when journalctl works" do
+        let(:result) { journalctl_result }
+
+        it "ignores journalctl markers" do
+          expect(subject.size).to eq(7)
+        end
+
+        it "returns an array of Entry objects" do
+          expect(subject.all? {|e| e.is_a?(SystemdJournal::Entry)}).to eq(true)
+        end
+
+        it "honours the entries order" do
+          names = [ "nfs", "wickedd-dhcp4", "wickedd-dhcp6", nil,
+                    "systemd-journal", "systemd-journal", nil ]
+          expect(subject.map(&:process_name)).to eq(names)
+        end
+      end
+    end
+  end
+
+  describe "#initialize" do
+    subject { SystemdJournal::Entry.new(json) }
+    let(:json) { json_for(entry) }
+    # Any entry will work for most general tests
+    let(:entry) { "nfs" }
+
+    it "stores the hostname as a string" do
+      expect(subject.hostname).to eq("testshost")
+    end
+
+    it "stores the timestamp as a Time object" do
+      entry_time = "2014-11-24 08:07:01 +0100"
+      expect(subject.timestamp).to be_a(Time)
+      expect(subject.timestamp.to_s).to eq(entry_time)
+    end
+
+    context "when the _COM attribute is included" do
       let(:entry) { "nfs" }
 
-      it "stores the hostname as a string" do
-        expect(subject.hostname).to eq("testshost")
+      it "stores it as #process_name" do
+        expect(subject.process_name).to eq("nfs")
       end
+    end
 
-      it "stores the timestamp as a Time object" do
-        entry_time = "2014-11-24 08:07:01 +0100"
-        expect(subject.timestamp).to be_a(Time)
-        expect(subject.timestamp.to_s).to eq(entry_time)
-      end
+    context "when the _COM attribute is not present" do
+      let(:entry) { "kernel" }
 
-      context "when the _COM attribute is included" do
-        let(:entry) { "nfs" }
-
-        it "stores it as #process_name" do
-          expect(subject.process_name).to eq("nfs")
-        end
-      end
-
-      context "when the _COM attribute is not present" do
-        let(:entry) { "kernel" }
-
-        it "sets process_name to nil" do
-          expect(subject.process_name).to be_nil
-        end
+      it "sets process_name to nil" do
+        expect(subject.process_name).to be_nil
       end
     end
   end
