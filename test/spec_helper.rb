@@ -35,11 +35,14 @@ def journalctl_error(message)
   {"exit" => 1, "stderr" => message, "stdout" => ""}
 end
 
-# Expect the specified call to journalctl and return a valid result
-def expect_journalctl(command)
-  expect(Yast::SCR).to receive(:Execute).
-    with(BASH_SCR_PATH, command).
-    and_return(journalctl_result)
+# Expect a command execution
+def expect_to_execute(cmd)
+  expect(Yast::SCR).to receive(:Execute).with(BASH_SCR_PATH, cmd)
+end
+
+# Stub a command execution
+def allow_to_execute(cmd)
+  allow(Yast::SCR).to receive(:Execute).with(BASH_SCR_PATH, cmd)
 end
 
 # JSON chunk describing a given entry, read from the example data directory

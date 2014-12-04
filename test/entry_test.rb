@@ -24,14 +24,14 @@ describe SystemdJournal::Entry do
 
   describe ".all" do
     subject { SystemdJournal::Entry.all(args) }
-    let(:command) { "LANG=C journalctl --no-pager -o json" }
+    let(:cmd) { "LANG=C journalctl --no-pager -o json" }
 
     describe "journalctl invocation" do
       context "when called with no additional arguments" do
         let(:args) { nil }
 
         it "invokes journalctl without filters" do
-          expect_journalctl(command)
+          expect_to_execute(cmd).and_return(journalctl_result)
           subject
         end
       end
@@ -40,7 +40,7 @@ describe SystemdJournal::Entry do
         let(:args) { "-b" }
 
         it "passes the arguments to journalctl" do
-          expect_journalctl("#{command} -b")
+          expect_to_execute("#{cmd} -b").and_return(journalctl_result)
           subject
         end
       end
@@ -51,9 +51,7 @@ describe SystemdJournal::Entry do
       let(:args) { nil }
       # Stub journalctl call
       before do
-        allow(Yast::SCR).to receive(:Execute).
-          with(BASH_SCR_PATH, /#{command}/).
-          and_return(result)
+        allow_to_execute(/#{cmd}/).and_return(result)
       end
 
       context "when journalctl reports 'Failed to determine timestamp'" do
