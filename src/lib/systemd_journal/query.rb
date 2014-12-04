@@ -19,7 +19,7 @@
 require 'systemd_journal/entry'
 
 module SystemdJournal
-  # Wrapper for journalctl usage.
+  # Wrapper for journalctl options.
   class Query
 
     JOURNALCTL_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -65,16 +65,18 @@ module SystemdJournal
           args << time_argument(:since, interval[:since])
           args << time_argument(:until, interval[:until])
         else
-          args << "--boot=#{@interval}"
+          args << "--boot=\"#{@interval}\""
         end
       end
+      # Remove empty time arguments
+      args.compact!
 
       # Add filters
       FILTERS.each do |filter|
         # Make sure it's an array and remove nils
         values = [@filters[filter[:name]]].flatten.compact
         values.each do |value|
-          args << "#{filter[:arg]}#{value}"
+          args << "#{filter[:arg]}\"#{value}\""
         end
       end
       
@@ -97,10 +99,11 @@ module SystemdJournal
     # @param arg [#to_s] name of the argument
     # @param value [#strftime,#to_s]
     def time_argument(arg, value)
+      return nil if value.nil?
       if value.respond_to?(:strftime)
-        value = "\"#{value.strftime(JOURNALCTL_TIME_FORMAT)}\""
+        value = "#{value.strftime(JOURNALCTL_TIME_FORMAT)}"
       end
-      "--#{arg}=#{value}"
+      "--#{arg}=\"#{value}\""
     end
   end
 end
