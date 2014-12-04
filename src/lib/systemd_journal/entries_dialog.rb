@@ -22,6 +22,7 @@ require 'systemd_journal/query_dialog'
 
 Yast.import "UI"
 Yast.import "Label"
+Yast.import "Popup"
 
 module SystemdJournal
   # Dialog to display journal entries with several filtering options
@@ -200,6 +201,10 @@ module SystemdJournal
       log.info "Calling journalctl with '#{@query.journalctl_args}'"
       @journal_entries = @query.entries
       log.info "Call to journalctl returned #{@journal_entries.size} entries."
+    rescue => e
+      log.warn e.message
+      @journal_entries = []
+      Yast::Popup.Message(e.message)
     end
   end
 end
