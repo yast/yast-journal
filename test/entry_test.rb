@@ -17,6 +17,7 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
+require "time"
 require_relative "spec_helper"
 require "systemd_journal/entry"
 
@@ -115,9 +116,9 @@ describe SystemdJournal::Entry do
     end
 
     it "stores the timestamp as a Time object" do
-      entry_time = "2014-11-24 08:07:01 +0100"
+      entry_time = Time.parse("2014-11-24 08:07:01 +0100")
       expect(subject.timestamp).to be_a(Time)
-      expect(subject.timestamp.to_s).to eq(entry_time)
+      expect(subject.timestamp.to_i).to eq(entry_time.to_i)
     end
 
     context "when the _COM attribute is included" do
