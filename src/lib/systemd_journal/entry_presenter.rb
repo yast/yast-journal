@@ -23,8 +23,6 @@ module SystemdJournal
   # Presenter for Entry adding useful methods for the dialogs
   class EntryPresenter < SimpleDelegator
 
-    include Yast::I18n
-
     # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 

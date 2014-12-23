@@ -37,6 +37,7 @@ module SystemdJournal
     INPUT_WIDTH = 20
 
     def initialize(query)
+      textdomain "systemd_journal"
       @query = query
     end
 
@@ -62,7 +63,7 @@ module SystemdJournal
 
   private
 
-    # Translates the value of the widgets to a new DialogFilter object
+    # Translates the value of the widgets to a new QueryPresenter object
     def query_from_widgets
       interval = Yast::UI.QueryWidget(Id(:interval), :CurrentButton)
       if interval == "Hash"

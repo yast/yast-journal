@@ -30,7 +30,7 @@ module SystemdJournal
       {name: :matches}
     ]
 
-    attr_reader :interval, :filters, :journalctl_args
+    attr_reader :interval, :filters
 
     # Creates a new query based on the time interval and some additional filters
     #

@@ -26,11 +26,14 @@ module SystemdJournal
 
     include Yast::I18n
     extend Yast::I18n
+    textdomain "systemd_journal"
 
     # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(args = {})
+      textdomain "systemd_journal"
+
       # Redefine default values
       query_args = {
         interval: QueryPresenter.default_interval,
