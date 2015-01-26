@@ -64,13 +64,13 @@ module SystemdJournal
         _("With no additional conditions")
       else
         descriptions = []
-        if value = filters[:units]
+        if value = filters["unit"]
           descriptions << _("units (%s)") % value.join(", ")
         end
-        if value = filters[:matches]
+        if value = filters["match"]
           descriptions << _("files (%s)") % value.join(", ")
         end
-        if value = filters[:priority]
+        if value = filters["priority"]
           descriptions << _("priority (%s)") % value
         end
         _("Filtering by %s") % descriptions.join(", ")
@@ -137,17 +137,17 @@ module SystemdJournal
     def self.filters
       [
         {
-          name: :units,
+          name: "unit",
           label: _("For these systemd units"),
           multiple: true
         },
         {
-          name: :matches,
+          name: "match",
           label: _("For these files (executable or device)"),
           multiple: true
         },
         {
-          name: :priority,
+          name: "priority",
           label: _("With at least this priority"),
           multiple: false,
           values: ["emerg", "alert", "crit", "err", "warning",

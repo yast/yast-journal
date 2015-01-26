@@ -52,5 +52,3 @@ module SystemdJournal
     end
   end
 end
-
-

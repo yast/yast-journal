@@ -35,6 +35,12 @@ def journalctl_error(message)
   {"exit" => 1, "stderr" => message, "stdout" => ""}
 end
 
+# Expect the execution of journalctl with the provided options and matches
+def expect_journalctl_with(*args)
+  expect(SystemdJournal::Journalctl).to receive(:new).with(*args).and_call_original
+  expect_to_execute(/journalctl/)
+end
+
 # Expect a command execution
 def expect_to_execute(cmd)
   expect(Yast::SCR).to receive(:Execute).with(BASH_SCR_PATH, cmd)

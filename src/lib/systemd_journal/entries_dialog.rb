@@ -198,7 +198,7 @@ module SystemdJournal
 
     # Reads the journal entries from the system
     def read_journal_entries
-      log.info "Calling journalctl with '#{@query.journalctl_args}'"
+      log.info "Calling journalctl with #{@query.journalctl_options} and #{@query.journalctl_matches}"
       @journal_entries = @query.entries
       log.info "Call to journalctl returned #{@journal_entries.size} entries."
     rescue => e

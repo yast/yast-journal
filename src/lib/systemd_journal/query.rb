@@ -17,18 +17,13 @@
 #  you may find current contact information at www.suse.com
 
 require 'systemd_journal/entry'
+require 'systemd_journal/journalctl'
 
 module SystemdJournal
-  # Wrapper for journalctl options.
+  # A more convenient interface to journalctl options
   class Query
 
-    JOURNALCTL_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-
-    FILTERS = [
-      {name: :priority, arg: "--priority="},
-      {name: :units, arg: "--unit="},
-      {name: :matches}
-    ]
+    VALID_FILTERS = ["unit", "priority", "match"]
 
     attr_reader :interval, :filters
 
@@ -40,70 +35,60 @@ module SystemdJournal
     #   * An scalar value to be passed to the --boot argument of journalctl
     #   In the first two cases, the values can be Time objects or strings of
     #   any format accepted by journalctl for --until and --since
-    # @param filters [Hash] valid keys are :priority, :units and :matches, the
-    #   values are strings or array of strings with the format accepted by the
-    #   corresponding journalctl argument. If the value is an Array, the
+    # @param filters [Hash] The keys must match one of the VALID_FILTERS.
+    #   The values are strings or array of strings with the format accepted by
+    #   the corresponding journalctl argument. If the value is an Array, the
     #   argument will be repeated as many times as needed.
     def initialize(interval: nil, filters: {})
       @interval = interval
-      @filters = filters
+      # Make sure the keys are strings
+      @filters = Hash[filters.map {|k,v| [k.to_s, v] }]
+      # Filter out unsuported filters
+      @filters.delete_if {|k,v| !VALID_FILTERS.include?(k) }
     end
 
-    # String with a list of arguments for journalctl
-    def journalctl_args
-      return @journalctl_args if @journalctl_args
+    # Hash of options in the format expected by SystemdJournal::Journalctl
+    def journalctl_options
+      return @journalctl_options if @journalctl_options
 
-      args = []
+      @journalctl_options = {}
 
       # If a interval was specified, translate it to journalctl arguments
       if @interval
         case @interval
         when Array
-          args << time_argument(:since, interval[0])
-          args << time_argument(:until, interval[1])
+          @journalctl_options["since"] = @interval[0]
+          @journalctl_options["until"] = @interval[1]
         when Hash
-          args << time_argument(:since, interval[:since])
-          args << time_argument(:until, interval[:until])
+          @journalctl_options["since"] = @interval[:since]
+          @journalctl_options["until"] = @interval[:until]
         else
-          args << "--boot=\"#{@interval}\""
+          @journalctl_options["boot"] = @interval
         end
       end
       # Remove empty time arguments
-      args.compact!
+      @journalctl_options.reject! {|k,v| v.nil? }
 
-      # Add filters
-      FILTERS.each do |filter|
-        # Make sure it's an array and remove nils
-        values = [@filters[filter[:name]]].flatten.compact
-        values.each do |value|
-          args << "#{filter[:arg]}\"#{value}\""
-        end
-      end
-      
-      @journalctl_args = args.join(" ")
+      # Add filters...
+      @journalctl_options.merge!(@filters)
+      # ...expect 'match'
+      @journalctl_options.delete("match")
+
+      @journalctl_options
+    end
+
+    # Array of matches in the format expected by SystemdJournal::Journalctl
+    def journalctl_matches
+      @filters["match"]
     end
 
     # Calls journalctl and returns an Array of Entry objects
     def entries
-      Entry.all(journalctl_args)
+      Entry.all(options: journalctl_options, matches: journalctl_matches)
     end
 
     def to_s
       "<interval: #{@interval}, filters: #{@filters}>"
-    end
-
-  private
-
-    # String representation of a time-based journalctl argument
-    # 
-    # @param arg [#to_s] name of the argument
-    # @param value [#strftime,#to_s]
-    def time_argument(arg, value)
-      return nil if value.nil?
-      if value.respond_to?(:strftime)
-        value = "#{value.strftime(JOURNALCTL_TIME_FORMAT)}"
-      end
-      "--#{arg}=\"#{value}\""
     end
   end
 end
