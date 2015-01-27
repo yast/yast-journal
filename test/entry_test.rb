@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, contact SUSE LLC.
 
-#  To contact Novell about this file by physical or electronic mail,
+#  To contact SUSE about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
 require "time"
@@ -25,82 +25,59 @@ describe SystemdJournal::Entry do
 
   describe ".all" do
     subject { SystemdJournal::Entry.all(args) }
-    let(:cmd) { "LANG=C journalctl --no-pager -o json" }
 
     describe "journalctl invocation" do
-      context "when called with no additional arguments" do
-        let(:args) { nil }
+      context "when called with no options or matches" do
+        let(:args) { {} }
 
         it "invokes journalctl without filters" do
-          expect_to_execute(cmd).and_return(journalctl_result)
+          expect_journalctl_with({"no-pager" => nil, "output" => "json"}, []).
+            and_return(cmd_result_for("journalctl"))
           subject
         end
       end
 
-      context "when called with additional arguments" do
-        let(:args) { "-b" }
+      context "when called with additional options" do
+        let(:args) { { options: { "boot" => 0 } } }
 
         it "passes the arguments to journalctl" do
-          expect_to_execute("#{cmd} -b").and_return(journalctl_result)
+          expect_journalctl_with({"no-pager" => nil, "output" => "json", "boot" => 0}, []).
+            and_return(cmd_result_for("journalctl"))
+          subject
+        end
+      end
+
+      context "when called with additional matches" do
+        let(:args) { { matches: ["/dev/sda"] } }
+
+        it "passes the arguments to journalctl" do
+          expect_journalctl_with({"no-pager" => nil, "output" => "json"}, ["/dev/sda"]).
+            and_return(cmd_result_for("journalctl"))
           subject
         end
       end
     end
 
     describe "journalctl parsing" do
-      # Arguments are not relevant, we are going to stub the call
-      let(:args) { nil }
-      # Stub journalctl call
+      # Arguments are not relevant, we are going to stub the journalctl call
+      let(:args) { {} }
+
       before do
-        allow_to_execute(/#{cmd}/).and_return(result)
+        allow_to_execute(/journalctl/).and_return(cmd_result_for("journalctl"))
       end
 
-      context "when journalctl reports 'Failed to determine timestamp'" do
-        let(:result) {
-          journalctl_error("Failed to determine timestamp: Cannot assign")
-        }
-
-        it "returns an empty array" do
-          expect(subject).to eq([])
-        end
+      it "ignores journalctl markers" do
+        expect(subject.size).to eq(7)
       end
 
-      context "when journalctl reports 'Failed to get realtime timestamp'" do
-        let(:result) {
-          journalctl_error("Failed to get realtime timestamp: Cannot assign")
-        }
-
-        it "returns an empty array" do
-          expect(subject).to eq([])
-        end
+      it "returns an array of Entry objects" do
+        expect(subject.all? {|e| e.is_a?(SystemdJournal::Entry)}).to eq(true)
       end
 
-      context "when journalctl reports an unexpected error" do
-        let(:result) {
-          journalctl_error("There are always more ways to crash")
-        }
-
-        it "raises RuntimeError" do
-          expect{subject}.to raise_error(RuntimeError)
-        end
-      end
-
-      context "when journalctl works" do
-        let(:result) { journalctl_result }
-
-        it "ignores journalctl markers" do
-          expect(subject.size).to eq(7)
-        end
-
-        it "returns an array of Entry objects" do
-          expect(subject.all? {|e| e.is_a?(SystemdJournal::Entry)}).to eq(true)
-        end
-
-        it "honours the entries order" do
-          names = [ "nfs", "wickedd-dhcp4", "wickedd-dhcp6", nil,
-                    "systemd-journal", "systemd-journal", nil ]
-          expect(subject.map(&:process_name)).to eq(names)
-        end
+      it "honours the entries order" do
+        names = [ "nfs", "wickedd-dhcp4", "wickedd-dhcp6", nil,
+                  "systemd-journal", "systemd-journal", nil ]
+        expect(subject.map(&:process_name)).to eq(names)
       end
     end
   end

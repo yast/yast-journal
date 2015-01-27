@@ -18,6 +18,7 @@
 
 require "json"
 require "yast"
+require "systemd_journal/journalctl"
 
 module SystemdJournal
   # An entry in the systemd journal
@@ -26,8 +27,7 @@ module SystemdJournal
     attr_reader :raw, :timestamp, :uid, :gid, :pid, :process_name, :cmdline,
       :syslog_id, :unit, :machine_id, :hostname, :message
 
-    BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
-    JOURNALCTL = "LANG=C journalctl --no-pager -o json"
+    JOURNALCTL_OPTS = { "no-pager" => nil, "output" => "json" }
 
     def initialize(json)
       @raw = JSON.parse(json)
@@ -46,9 +46,8 @@ module SystemdJournal
 
     # Calls journalctl and returns an array of Entry objects
     #
-    # @param journalctl_args [String] Additional arguments to journalctl
-    def self.all(journalctl_args = "")
-      output = journalctl_output(journalctl_args)
+    def self.all(options: {}, matches: [])
+      output = Journalctl.new(options.merge(JOURNALCTL_OPTS), matches).output
       # Ignore lines not representing journal entries, like the following
       # -- Reboot --
       json_entries = output.each_line.select do |line|
@@ -57,28 +56,6 @@ module SystemdJournal
 
       json_entries.map do |json|
         new(json)
-      end
-    end
-
-  private
-
-    # Handles the journalctl call
-    #
-    # @param args [String] arguments to journalctl
-    # @return [String] command output
-    def self.journalctl_output(args)
-      cmd = "#{JOURNALCTL} #{args}".strip
-      cmd_result = Yast::SCR.Execute(BASH_SCR_PATH, cmd)
-
-      if cmd_result["exit"].zero?
-        cmd_result["stdout"]
-      else
-        if cmd_result["stderr"] =~ /^Failed to .* timestamp:/
-          # Most likely, journalctl bug when an empty list is found
-          ""
-        else
-          raise "Calling journalctl failed: #{cmd_result["stderr"]}"
-        end
       end
     end
   end

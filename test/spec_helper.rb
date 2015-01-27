@@ -23,9 +23,9 @@ DATA_PATH = File.join(File.expand_path(File.dirname(__FILE__)), "data")
 require 'yast'
 BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
 
-# Stubbed result from a call to journalctl using the example data
-def journalctl_result
-  file = File.join(DATA_PATH, "journalctl.out")
+# Stubbed result of calling a command
+def cmd_result_for(name)
+  file = File.join(DATA_PATH, "#{name}.out")
   content = File.open(file) {|f| f.read }
   {"exit" => 0, "stderr" => "", "stdout" => content}
 end
@@ -33,6 +33,12 @@ end
 # Stubbed result from a call to journalctl which went wrong
 def journalctl_error(message)
   {"exit" => 1, "stderr" => message, "stdout" => ""}
+end
+
+# Expect the execution of journalctl with the provided options and matches
+def expect_journalctl_with(*args)
+  expect(SystemdJournal::Journalctl).to receive(:new).with(*args).and_call_original
+  expect_to_execute(/journalctl/)
 end
 
 # Expect a command execution

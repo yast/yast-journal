@@ -17,20 +17,21 @@
 #  you may find current contact information at www.suse.com
 
 require 'systemd_journal/entry'
+require 'systemd_journal/journalctl'
 
 module SystemdJournal
-  # Wrapper for journalctl options.
+  # A more convenient interface to journalctl options
   class Query
 
-    JOURNALCTL_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+    VALID_FILTERS = ["unit", "priority", "match"]
 
-    FILTERS = [
-      {name: :priority, arg: "--priority="},
-      {name: :units, arg: "--unit="},
-      {name: :matches}
-    ]
-
-    attr_reader :interval, :filters, :journalctl_args
+    attr_reader :interval, :filters
+    # @return [Hash] options in the format expected by SystemdJournal::Journalctl
+    # @see SystemdJournal::Journalctl#initialize
+    attr_reader :journalctl_options
+    # @return [Array] matches in the format expected by SystemdJournal::Journalctl
+    # @see SystemdJournal::Journalctl#initialize
+    attr_reader :journalctl_matches
 
     # Creates a new query based on the time interval and some additional filters
     #
@@ -40,70 +41,82 @@ module SystemdJournal
     #   * An scalar value to be passed to the --boot argument of journalctl
     #   In the first two cases, the values can be Time objects or strings of
     #   any format accepted by journalctl for --until and --since
-    # @param filters [Hash] valid keys are :priority, :units and :matches, the
-    #   values are strings or array of strings with the format accepted by the
-    #   corresponding journalctl argument. If the value is an Array, the
-    #   argument will be repeated as many times as needed.
+    # @param filters [Hash] The keys must match one of the VALID_FILTERS.
+    #   The values are scalars or arrays with the value for the corresponding
+    #   journalctl argument. If the value is an Array, the argument will be
+    #   repeated as many times as needed.
+    # @see SystemdJournal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
-      @interval = interval
+      unsupported = filters.keys.select {|k| !VALID_FILTERS.include?(k) }
+      if !unsupported.empty?
+        raise "Unexpected filters for the query: #{unsupported.join(', ')}"
+      end
       @filters = filters
-    end
+      @interval = interval
 
-    # String with a list of arguments for journalctl
-    def journalctl_args
-      return @journalctl_args if @journalctl_args
-
-      args = []
-
-      # If a interval was specified, translate it to journalctl arguments
-      if @interval
-        case @interval
-        when Array
-          args << time_argument(:since, interval[0])
-          args << time_argument(:until, interval[1])
-        when Hash
-          args << time_argument(:since, interval[:since])
-          args << time_argument(:until, interval[:until])
-        else
-          args << "--boot=\"#{@interval}\""
-        end
+      if filters["match"].nil?
+        @journalctl_matches = []
+      else
+        @journalctl_matches = [filters["match"]].flatten
       end
-      # Remove empty time arguments
-      args.compact!
 
-      # Add filters
-      FILTERS.each do |filter|
-        # Make sure it's an array and remove nils
-        values = [@filters[filter[:name]]].flatten.compact
-        values.each do |value|
-          args << "#{filter[:arg]}\"#{value}\""
-        end
-      end
-      
-      @journalctl_args = args.join(" ")
+      calculate_options
     end
 
     # Calls journalctl and returns an Array of Entry objects
     def entries
-      Entry.all(journalctl_args)
+      Entry.all(options: journalctl_options, matches: journalctl_matches)
     end
 
     def to_s
       "<interval: #{@interval}, filters: #{@filters}>"
     end
 
+    # Array of system's boots registered in the journal.
+    #
+    # Each boot is represented by a hash with three elements, with all the keys
+    # being symbols and all the values being strings.
+    #  * id: 32-character identifier
+    #  * offset: offset relative to the current boot
+    #  * timestamps: timestamps of the first and last message for the boot
+    def self.boots
+      Journalctl.new({"list-boots" => nil}, []).output.lines.map do |line|
+        # The 'journalctl --list-boots' output looks like this
+        # -1 a07ac085b07d43d99b09ee9d146af240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
+        #  0 24a9a89c43d34f859399f7994a233ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
+        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)$/
+          { id: $2, offset: $1, timestamps: $3 }
+        else
+          raise "Unexpected output for journalctl --list-boots: #{line}"
+        end
+      end
+    end
+
   private
 
-    # String representation of a time-based journalctl argument
-    # 
-    # @param arg [#to_s] name of the argument
-    # @param value [#strftime,#to_s]
-    def time_argument(arg, value)
-      return nil if value.nil?
-      if value.respond_to?(:strftime)
-        value = "#{value.strftime(JOURNALCTL_TIME_FORMAT)}"
+    def calculate_options
+      @journalctl_options = {}
+
+      # If a interval was specified, translate it to journalctl arguments
+      if @interval
+        case @interval
+        when Array
+          @journalctl_options["since"] = @interval[0]
+          @journalctl_options["until"] = @interval[1]
+        when Hash
+          @journalctl_options["since"] = @interval[:since]
+          @journalctl_options["until"] = @interval[:until]
+        else
+          @journalctl_options["boot"] = @interval
+        end
       end
-      "--#{arg}=\"#{value}\""
+      # Remove empty time arguments
+      @journalctl_options.reject! {|k,v| v.nil? }
+
+      # Add filters...
+      @journalctl_options.merge!(@filters)
+      # expect 'match' that is not an option but stored at @journalctl_matches
+      @journalctl_options.delete("match")
     end
   end
 end

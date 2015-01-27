@@ -26,11 +26,14 @@ module SystemdJournal
 
     include Yast::I18n
     extend Yast::I18n
+    textdomain "systemd_journal"
 
     # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(args = {})
+      textdomain "systemd_journal"
+
       # Redefine default values
       query_args = {
         interval: QueryPresenter.default_interval,
@@ -61,13 +64,13 @@ module SystemdJournal
         _("With no additional conditions")
       else
         descriptions = []
-        if value = filters[:units]
+        if value = filters["unit"]
           descriptions << _("units (%s)") % value.join(", ")
         end
-        if value = filters[:matches]
+        if value = filters["match"]
           descriptions << _("files (%s)") % value.join(", ")
         end
-        if value = filters[:priority]
+        if value = filters["priority"]
           descriptions << _("priority (%s)") % value
         end
         _("Filtering by %s") % descriptions.join(", ")
@@ -95,11 +98,16 @@ module SystemdJournal
     # @return [Array<Hash>] each interval is represented by a hash with two keys
     #                 :value and :label
     def self.intervals
-      [
+      boots = Query.boots
+      intervals = [
         {value: Hash, label: _("Between these dates")},
-        {value: "0", label: _("Since system's boot")},
-        {value: "-1", label: _("From previous boot")}
+        {value: "0", label: _("Since system's boot (%s)") % boots.last[:timestamps]}
       ]
+      if boots.size > 1
+        label = _("From previous boot (%s)") % boots[-2][:timestamps]
+        intervals << {value: "-1", label: label}
+      end
+      intervals
     end
 
     # Default value for interval[:since]
@@ -134,17 +142,17 @@ module SystemdJournal
     def self.filters
       [
         {
-          name: :units,
+          name: "unit",
           label: _("For these systemd units"),
           multiple: true
         },
         {
-          name: :matches,
+          name: "match",
           label: _("For these files (executable or device)"),
           multiple: true
         },
         {
-          name: :priority,
+          name: "priority",
           label: _("With at least this priority"),
           multiple: false,
           values: ["emerg", "alert", "crit", "err", "warning",
