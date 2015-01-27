@@ -26,6 +26,12 @@ module SystemdJournal
     VALID_FILTERS = ["unit", "priority", "match"]
 
     attr_reader :interval, :filters
+    # @return [Hash] options in the format expected by SystemdJournal::Journalctl
+    # @see SystemdJournal::Journalctl#initialize
+    attr_reader :journalctl_options
+    # @return [Array] matches in the format expected by SystemdJournal::Journalctl
+    # @see SystemdJournal::Journalctl#initialize
+    attr_reader :journalctl_matches
 
     # Creates a new query based on the time interval and some additional filters
     #
@@ -47,41 +53,14 @@ module SystemdJournal
       end
       @filters = filters
       @interval = interval
-    end
 
-    # Hash of options in the format expected by SystemdJournal::Journalctl
-    def journalctl_options
-      return @journalctl_options if @journalctl_options
-
-      @journalctl_options = {}
-
-      # If a interval was specified, translate it to journalctl arguments
-      if @interval
-        case @interval
-        when Array
-          @journalctl_options["since"] = @interval[0]
-          @journalctl_options["until"] = @interval[1]
-        when Hash
-          @journalctl_options["since"] = @interval[:since]
-          @journalctl_options["until"] = @interval[:until]
-        else
-          @journalctl_options["boot"] = @interval
-        end
+      if filters["match"].nil?
+        @journalctl_matches = []
+      else
+        @journalctl_matches = [filters["match"]].flatten
       end
-      # Remove empty time arguments
-      @journalctl_options.reject! {|k,v| v.nil? }
 
-      # Add filters...
-      @journalctl_options.merge!(@filters)
-      # ...expect 'match' that is not an option but passed as journalctl_matches
-      @journalctl_options.delete("match")
-
-      @journalctl_options
-    end
-
-    # Array of matches in the format expected by SystemdJournal::Journalctl
-    def journalctl_matches
-      @filters["match"].nil? ? [] : [@filters["match"]].flatten
+      calculate_options
     end
 
     # Calls journalctl and returns an Array of Entry objects
@@ -111,6 +90,33 @@ module SystemdJournal
           raise "Unexpected output for journalctl --list-boots: #{line}"
         end
       end
+    end
+
+  private
+
+    def calculate_options
+      @journalctl_options = {}
+
+      # If a interval was specified, translate it to journalctl arguments
+      if @interval
+        case @interval
+        when Array
+          @journalctl_options["since"] = @interval[0]
+          @journalctl_options["until"] = @interval[1]
+        when Hash
+          @journalctl_options["since"] = @interval[:since]
+          @journalctl_options["until"] = @interval[:until]
+        else
+          @journalctl_options["boot"] = @interval
+        end
+      end
+      # Remove empty time arguments
+      @journalctl_options.reject! {|k,v| v.nil? }
+
+      # Add filters...
+      @journalctl_options.merge!(@filters)
+      # expect 'match' that is not an option but stored at @journalctl_matches
+      @journalctl_options.delete("match")
     end
   end
 end
