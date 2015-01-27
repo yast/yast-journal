@@ -48,4 +48,20 @@ describe SystemdJournal::QueryPresenter do
       expect(presenter.interval.keys).to include(:until)
     end
   end
+
+  describe ".intervals" do
+    subject { SystemdJournal::QueryPresenter.intervals }
+
+    it "returns three options if there are enough boots" do
+      allow_to_execute(/journalctl --list-boots/).
+        and_return(cmd_result_for("list-boots-11"))
+      expect(subject.size).to eq(3)
+    end
+
+    it "returns only two options if there is only one boot" do
+      allow_to_execute(/journalctl --list-boots/).
+        and_return(cmd_result_for("list-boots-1"))
+      expect(subject.size).to eq(2)
+    end
+  end
 end

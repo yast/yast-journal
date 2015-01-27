@@ -90,6 +90,20 @@ module SystemdJournal
     def to_s
       "<interval: #{@interval}, filters: #{@filters}>"
     end
+
+    # Array of system's boots registered in the journal.
+    #
+    # Each boot is represented by a hash with three elements, with all the keys
+    # being symbols and all the values being strings.
+    #  * id: 32-character identifier
+    #  * offset: offset relative to the current boot
+    #  * timestamps: timestamps of the first and last message for the boot
+    def self.boots
+      Journalctl.new({"list-boots" => nil}, nil).output.lines.map do |line|
+        next unless line.strip =~ /^ *(-*\d+) +(\w+) +(.+)$/
+        { id: $2, offset: $1, timestamps: $3 }
+      end
+    end
   end
 end
 

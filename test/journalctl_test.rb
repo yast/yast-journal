@@ -60,7 +60,7 @@ describe SystemdJournal::Journalctl do
     end
 
     context "when journalctl works" do
-      let(:result) { journalctl_result }
+      let(:result) { cmd_result_for("journalctl") }
 
       it "returns the command output" do
         expect(subject).to eq(result["stdout"])

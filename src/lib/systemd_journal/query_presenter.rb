@@ -98,11 +98,16 @@ module SystemdJournal
     # @return [Array<Hash>] each interval is represented by a hash with two keys
     #                 :value and :label
     def self.intervals
-      [
+      boots = Query.boots
+      intervals = [
         {value: Hash, label: _("Between these dates")},
-        {value: "0", label: _("Since system's boot")},
-        {value: "-1", label: _("From previous boot")}
+        {value: "0", label: _("Since system's boot (%s)") % boots.last[:timestamps]}
       ]
+      if boots.size > 1
+        label = _("From previous boot (%s)") % boots[-2][:timestamps]
+        intervals << {value: "-1", label: label}
+      end
+      intervals
     end
 
     # Default value for interval[:since]
