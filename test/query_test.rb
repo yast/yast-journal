@@ -121,12 +121,19 @@ describe SystemdJournal::Query do
       end
     end
 
+    context "when filters include an invalid key" do
+      let(:args) { { filters: { "whatever" => "you need" } } }
+
+      it "raises an error" do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
     context "when interval and filters are used" do
       let(:args) {
         {
           interval: -1,
           filters: {
-            "whatever" => "you need",
             "unit" => ["two", "units"],
             "match" => "a match"
           }
@@ -135,10 +142,6 @@ describe SystemdJournal::Query do
 
       it "includes the valid filters" do
         expect(subject["unit"]).to eq(["two", "units"])
-      end
-
-      it "ignores the invalid filters" do
-        expect(subject["whatever"]).to be_nil
       end
 
       it "excludes the match key" do
@@ -157,8 +160,8 @@ describe SystemdJournal::Query do
     context "with empty filters" do
       let(:filters) { {} }
 
-      it "returns nil" do
-        expect(subject).to eq(nil)
+      it "returns an empty array" do
+        expect(subject).to eq([])
       end
     end
 
@@ -170,8 +173,8 @@ describe SystemdJournal::Query do
         }
       }
 
-      it "returns the value of the 'match' filter" do
-        expect(subject).to eq("a match")
+      it "returns the value of the 'match' filter as an array" do
+        expect(subject).to eq(["a match"])
       end
     end
   end

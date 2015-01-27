@@ -28,10 +28,14 @@ module SystemdJournal
 
     # @param options [Hash] The keys are options of the journalctl command like
     #   "boot" or "no-pager" (the long option name should be used). The values
-    #   are the corresponding values for the option or nil for options without
-    #   an expected value. For options that can be specified multiple times per
-    #   command, an array can be used.
-    # @param options [Array] list of journalctl matches
+    #   are the corresponding values for the option and can be:
+    #
+    #    * nil for options without an expected value
+    #    * a scalar value (numbers and times/dates would be converted to the
+    #      format expected by the journalctl command)
+    #    * an array of escalars for options that can be specified multiple times
+    #
+    # @param matches [Array<String>] list of journalctl matches
     #
     # @example Kernel messages in the last minute for a given device and units
     #   Journalctl.new(
@@ -54,15 +58,14 @@ module SystemdJournal
 
     # Output resulting of executing the command
     def output
-      return @output if @output
       cmd_result = Yast::SCR.Execute(BASH_SCR_PATH, command)
 
       if cmd_result["exit"].zero?
-        @output = cmd_result["stdout"]
+        cmd_result["stdout"]
       else
         if cmd_result["stderr"] =~ /^Failed to .* timestamp:/
           # Most likely, journalctl bug when an empty list is found
-          @output = ""
+          ""
         else
           raise "Calling journalctl failed: #{cmd_result["stderr"]}"
         end
@@ -78,8 +81,8 @@ module SystemdJournal
         if value.nil?
           strings << "--#{option}"
         else
-          # In order to handle options with multiple values,
-          # make sure it's an array and remove nils
+          # In order to handle options with multiple values, make sure it's an
+          # array and remove nils (they make no sense with multiple values)
           values = [value].flatten.compact
           values.each do |v|
             v = v.strftime(TIME_FORMAT) if v.respond_to?(:strftime)
@@ -91,12 +94,7 @@ module SystemdJournal
     end
 
     def matches_string
-      @matches_string if @matches_string
-      if @matches.is_a?(::String)
-        @matches_string = @matches
-      else
-        @matches_string = @matches.respond_to?(:join) ? @matches.join(" ") : ""
-      end
+      @matches_string ||= @matches.join(" ")
     end
   end
 end

@@ -42,7 +42,7 @@ describe SystemdJournal::QueryPresenter do
   end
 
   describe "#initialize" do
-    it "redefines default interval" do
+    it "redefines the Query default interval" do
       expect(presenter.interval).to be_a(Hash)
       expect(presenter.interval.keys).to include(:since)
       expect(presenter.interval.keys).to include(:until)

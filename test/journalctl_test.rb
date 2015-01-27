@@ -29,6 +29,14 @@ describe SystemdJournal::Journalctl do
       allow_to_execute(/journalctl/).and_return(result)
     end
 
+    context "when journalctl works" do
+      let(:result) { cmd_result_for("journalctl") }
+
+      it "returns the command output" do
+        expect(subject).to eq(result["stdout"])
+      end
+    end
+
     context "when journalctl reports 'Failed to determine timestamp'" do
       let(:result) {
         journalctl_error("Failed to determine timestamp: Cannot assign")
@@ -58,59 +66,25 @@ describe SystemdJournal::Journalctl do
         expect{subject}.to raise_error(RuntimeError)
       end
     end
-
-    context "when journalctl works" do
-      let(:result) { cmd_result_for("journalctl") }
-
-      it "returns the command output" do
-        expect(subject).to eq(result["stdout"])
-      end
-    end
   end
 
   describe "#command" do
     subject { SystemdJournal::Journalctl.new(options, matches).command }
 
-    describe "matches generation" do
+    describe "generation of journalctl matches" do
       let(:options) { {} }
+      let(:matches) { ["/dev/sda", "/dev/sdb"] }
 
-      context "when 'matches' is nil" do
-        let(:matches) { nil }
-
-        it "does not include matches in the command" do
-          expect(subject).to match(/journalctl$/)
-        end
-      end
-
-      context "when 'matches' is an empty string" do
-        let(:matches) { "" }
-
-        it "does not include matches in the command" do
-          expect(subject).to match(/journalctl$/)
-        end
-      end
-
-      context "when 'matches' is a string" do
-        let(:matches) { "/dev/sda" }
-
-        it "adds the string at the end of the command" do
-          expect(subject).to match(/journalctl \/dev\/sda$/)
-        end
-      end
-      context "when 'matches' is an array" do
-        let(:matches) { ["/dev/sda", "/dev/sdb"] }
-
-        it "adds the strings at the end of the command" do
-          expect(subject).to match(/journalctl \/dev\/sda \/dev\/sdb$/)
-        end
+      it "adds the strings separated by space at the end of the command" do
+        expect(subject).to match(/journalctl \/dev\/sda \/dev\/sdb$/)
       end
     end
 
-    describe "options generation" do
-      let(:matches) { nil }
+    describe "generation of journalctl options" do
+      let(:matches) { [] }
       let(:options) { { "option" => option } }
 
-      context "when receiving a nil option" do
+      context "when receiving an option with a nil value" do
         let(:option) { nil }
 
         it "includes the option without assigned value" do
@@ -118,7 +92,7 @@ describe SystemdJournal::Journalctl do
         end
       end
 
-      context "when receiving a string" do
+      context "when receiving an option with a string value" do
         let(:option) { "value" }
 
         it "assigns the string" do
@@ -126,7 +100,7 @@ describe SystemdJournal::Journalctl do
         end
       end
 
-      context "when receiving a number" do
+      context "when receiving an option with a numeric value" do
         let(:option) { -1 }
 
         it "assigns the value as a string" do
@@ -134,7 +108,7 @@ describe SystemdJournal::Journalctl do
         end
       end
 
-      context "when receiving a time object" do
+      context "when receiving an option with a time object" do
         let(:option) { Time.new(2014,1,2,3,4,5) }
 
         it "assigns the formatted time" do
@@ -142,7 +116,7 @@ describe SystemdJournal::Journalctl do
         end
       end
 
-      context "when receiving an array" do
+      context "when receiving an option with an array" do
         let(:option) { ["value", Time.new(2014,1,2,3,4,5)] }
 
         it "includes the option as many times as needed" do

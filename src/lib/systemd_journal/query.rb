@@ -36,15 +36,17 @@ module SystemdJournal
     #   In the first two cases, the values can be Time objects or strings of
     #   any format accepted by journalctl for --until and --since
     # @param filters [Hash] The keys must match one of the VALID_FILTERS.
-    #   The values are strings or array of strings with the format accepted by
-    #   the corresponding journalctl argument. If the value is an Array, the
-    #   argument will be repeated as many times as needed.
+    #   The values are scalars or arrays with the value for the corresponding
+    #   journalctl argument. If the value is an Array, the argument will be
+    #   repeated as many times as needed.
+    # @see SystemdJournal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
+      unsupported = filters.keys.select {|k| !VALID_FILTERS.include?(k) }
+      if !unsupported.empty?
+        raise "Unexpected filters for the query: #{unsupported.join(', ')}"
+      end
+      @filters = filters
       @interval = interval
-      # Make sure the keys are strings
-      @filters = Hash[filters.map {|k,v| [k.to_s, v] }]
-      # Filter out unsuported filters
-      @filters.delete_if {|k,v| !VALID_FILTERS.include?(k) }
     end
 
     # Hash of options in the format expected by SystemdJournal::Journalctl
@@ -71,7 +73,7 @@ module SystemdJournal
 
       # Add filters...
       @journalctl_options.merge!(@filters)
-      # ...expect 'match'
+      # ...expect 'match' that is not an option but passed as journalctl_matches
       @journalctl_options.delete("match")
 
       @journalctl_options
@@ -79,7 +81,7 @@ module SystemdJournal
 
     # Array of matches in the format expected by SystemdJournal::Journalctl
     def journalctl_matches
-      @filters["match"]
+      @filters["match"].nil? ? [] : [@filters["match"]].flatten
     end
 
     # Calls journalctl and returns an Array of Entry objects
@@ -99,9 +101,15 @@ module SystemdJournal
     #  * offset: offset relative to the current boot
     #  * timestamps: timestamps of the first and last message for the boot
     def self.boots
-      Journalctl.new({"list-boots" => nil}, nil).output.lines.map do |line|
-        next unless line.strip =~ /^ *(-*\d+) +(\w+) +(.+)$/
-        { id: $2, offset: $1, timestamps: $3 }
+      Journalctl.new({"list-boots" => nil}, []).output.lines.map do |line|
+        # The 'journalctl --list-boots' output looks like this
+        # -1 a07ac085b07d43d99b09ee9d146af240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
+        #  0 24a9a89c43d34f859399f7994a233ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
+        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)$/
+          { id: $2, offset: $1, timestamps: $3 }
+        else
+          raise "Unexpected output for journalctl --list-boots: #{line}"
+        end
       end
     end
   end
