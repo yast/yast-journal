@@ -1,6 +1,11 @@
 YaST systemd journal module
 ===========================
 
-Temporary repository for hosting yast-journal, a module for YaST to read the
-systemd journal. It will be the base for a rather basic tutorial about starting
-a module from scratch.
+A module for [YaST](http://yast.github.io) to read the systemd journal in a
+user-friendly way.
+
+Further information
+-------------------
+
+More information about YaST can be found at its
+[homepage](http://yast.github.io).
