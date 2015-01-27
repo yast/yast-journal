@@ -20,6 +20,7 @@ require "yast/rake"
 
 Yast::Tasks.configuration do |conf|
 
+  conf.skip_license_check << /test\/data\/*/
   # Desktop files are just metadata
   conf.skip_license_check << /.*desktop$/
   # The package does not live in the official YaST:Head OBS project
