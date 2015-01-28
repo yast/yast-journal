@@ -19,7 +19,6 @@
 module SystemdJournal
   # Wrapper for journalctl invocation
   class Journalctl
-
     BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
     COMMAND = "LANG=C journalctl"
     TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -72,7 +71,7 @@ module SystemdJournal
       end
     end
 
-  private
+    private
 
     def options_string
       return @options_string if @option_string

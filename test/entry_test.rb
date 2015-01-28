@@ -22,7 +22,6 @@ require_relative "spec_helper"
 require "systemd_journal/entry"
 
 describe SystemdJournal::Entry do
-
   describe ".all" do
     subject { SystemdJournal::Entry.all(args) }
 
@@ -31,8 +30,8 @@ describe SystemdJournal::Entry do
         let(:args) { {} }
 
         it "invokes journalctl without filters" do
-          expect_journalctl_with({"no-pager" => nil, "output" => "json"}, []).
-            and_return(cmd_result_for("journalctl"))
+          expect_journalctl_with({ "no-pager" => nil, "output" => "json" }, [])
+            .and_return(cmd_result_for("journalctl"))
           subject
         end
       end
@@ -41,8 +40,8 @@ describe SystemdJournal::Entry do
         let(:args) { { options: { "boot" => 0 } } }
 
         it "passes the arguments to journalctl" do
-          expect_journalctl_with({"no-pager" => nil, "output" => "json", "boot" => 0}, []).
-            and_return(cmd_result_for("journalctl"))
+          expect_journalctl_with({ "no-pager" => nil, "output" => "json", "boot" => 0 }, [])
+            .and_return(cmd_result_for("journalctl"))
           subject
         end
       end
@@ -51,8 +50,8 @@ describe SystemdJournal::Entry do
         let(:args) { { matches: ["/dev/sda"] } }
 
         it "passes the arguments to journalctl" do
-          expect_journalctl_with({"no-pager" => nil, "output" => "json"}, ["/dev/sda"]).
-            and_return(cmd_result_for("journalctl"))
+          expect_journalctl_with({ "no-pager" => nil, "output" => "json" }, ["/dev/sda"])
+            .and_return(cmd_result_for("journalctl"))
           subject
         end
       end
@@ -71,12 +70,12 @@ describe SystemdJournal::Entry do
       end
 
       it "returns an array of Entry objects" do
-        expect(subject.all? {|e| e.is_a?(SystemdJournal::Entry)}).to eq(true)
+        expect(subject.all? { |e| e.is_a?(SystemdJournal::Entry) }).to eq(true)
       end
 
       it "honours the entries order" do
-        names = [ "nfs", "wickedd-dhcp4", "wickedd-dhcp6", nil,
-                  "systemd-journal", "systemd-journal", nil ]
+        names = ["nfs", "wickedd-dhcp4", "wickedd-dhcp6", nil,
+                 "systemd-journal", "systemd-journal", nil]
         expect(subject.map(&:process_name)).to eq(names)
       end
     end

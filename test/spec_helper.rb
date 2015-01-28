@@ -20,19 +20,19 @@
 ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
 DATA_PATH = File.join(File.expand_path(File.dirname(__FILE__)), "data")
 
-require 'yast'
+require "yast"
 BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
 
 # Stubbed result of calling a command
 def cmd_result_for(name)
   file = File.join(DATA_PATH, "#{name}.out")
-  content = File.open(file, :encoding => "UTF-8") {|f| f.read }
-  {"exit" => 0, "stderr" => "", "stdout" => content}
+  content = File.open(file, encoding: "UTF-8") { |f| f.read }
+  { "exit" => 0, "stderr" => "", "stdout" => content }
 end
 
 # Stubbed result from a call to journalctl which went wrong
 def journalctl_error(message)
-  {"exit" => 1, "stderr" => message, "stdout" => ""}
+  { "exit" => 1, "stderr" => message, "stdout" => "" }
 end
 
 # Expect the execution of journalctl with the provided options and matches
@@ -54,5 +54,5 @@ end
 # JSON chunk describing a given entry, read from the example data directory
 def json_for(name)
   file = File.join(DATA_PATH, "#{name}-entry.json")
-  File.open(file, :encoding => "UTF-8") {|f| f.read }
+  File.open(file, encoding: "UTF-8") { |f| f.read }
 end

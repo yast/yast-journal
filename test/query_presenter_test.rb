@@ -28,8 +28,8 @@ describe SystemdJournal::QueryPresenter do
     subject { presenter.entries }
 
     before do
-      allow(query).to receive(:entries).
-        and_return([SystemdJournal::Entry.new(json_for('nfs'))])
+      allow(query).to receive(:entries)
+        .and_return([SystemdJournal::Entry.new(json_for("nfs"))])
     end
 
     it "returns an array of EntryPresenter objects" do
@@ -53,14 +53,14 @@ describe SystemdJournal::QueryPresenter do
     subject { SystemdJournal::QueryPresenter.intervals }
 
     it "returns three options if there are enough boots" do
-      allow_to_execute(/journalctl --list-boots/).
-        and_return(cmd_result_for("list-boots-11"))
+      allow_to_execute(/journalctl --list-boots/)
+        .and_return(cmd_result_for("list-boots-11"))
       expect(subject.size).to eq(3)
     end
 
     it "returns only two options if there is only one boot" do
-      allow_to_execute(/journalctl --list-boots/).
-        and_return(cmd_result_for("list-boots-1"))
+      allow_to_execute(/journalctl --list-boots/)
+        .and_return(cmd_result_for("list-boots-1"))
       expect(subject.size).to eq(2)
     end
   end

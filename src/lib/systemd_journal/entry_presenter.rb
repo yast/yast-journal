@@ -16,13 +16,12 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'systemd_journal/entry'
-require 'delegate'
+require "systemd_journal/entry"
+require "delegate"
 
 module SystemdJournal
   # Presenter for Entry adding useful methods for the dialogs
   class EntryPresenter < SimpleDelegator
-
     # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 

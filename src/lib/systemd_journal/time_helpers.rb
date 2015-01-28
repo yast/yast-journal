@@ -16,12 +16,11 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'time'
+require "time"
 
 module SystemdJournal
   # Commodity methods for dealing with time fields in the dialogs
   module TimeHelpers
-
     # Array of widgets representing one time field.
     #
     # The result depends on the used UI, since not all widgets are available

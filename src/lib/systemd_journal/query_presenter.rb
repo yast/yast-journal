@@ -16,14 +16,13 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'systemd_journal/query'
-require 'systemd_journal/entry_presenter'
-require 'delegate'
+require "systemd_journal/query"
+require "systemd_journal/entry_presenter"
+require "delegate"
 
 module SystemdJournal
   # Presenter for Query adding useful methods for the dialogs
   class QueryPresenter < SimpleDelegator
-
     include Yast::I18n
     extend Yast::I18n
     textdomain "systemd_journal"
@@ -37,7 +36,7 @@ module SystemdJournal
       # Redefine default values
       query_args = {
         interval: QueryPresenter.default_interval,
-        filters: QueryPresenter.default_filters
+        filters:  QueryPresenter.default_filters
       }
       query_args.merge!(args)
 
@@ -54,7 +53,7 @@ module SystemdJournal
     #
     # @return [Array<EntryPresenter]
     def entries
-      query.entries.map {|entry| EntryPresenter.new(entry) }
+      query.entries.map { |entry| EntryPresenter.new(entry) }
     end
 
     # User readable description of the current filters
@@ -87,7 +86,7 @@ module SystemdJournal
       else
         dates = {
           since: interval[:since].strftime(TIME_FORMAT),
-          until: interval[:until].strftime(TIME_FORMAT),
+          until: interval[:until].strftime(TIME_FORMAT)
         }
         _("Between %{since} and %{until}") % dates
       end
@@ -100,12 +99,12 @@ module SystemdJournal
     def self.intervals
       boots = Query.boots
       intervals = [
-        {value: Hash, label: _("Between these dates")},
-        {value: "0", label: _("Since system's boot (%s)") % boots.last[:timestamps]}
+        { value: Hash, label: _("Between these dates") },
+        { value: "0", label: _("Since system's boot (%s)") % boots.last[:timestamps] }
       ]
       if boots.size > 1
         label = _("From previous boot (%s)") % boots[-2][:timestamps]
-        intervals << {value: "-1", label: label}
+        intervals << { value: "-1", label: label }
       end
       intervals
     end
@@ -113,7 +112,7 @@ module SystemdJournal
     # Default value for interval[:since]
     def self.default_since
       # 24 hours ago
-      Time.now - 24*60*60
+      Time.now - 24 * 60 * 60
     end
 
     # Default value for interval[:until]
@@ -142,21 +141,21 @@ module SystemdJournal
     def self.filters
       [
         {
-          name: "unit",
-          label: _("For these systemd units"),
+          name:     "unit",
+          label:    _("For these systemd units"),
           multiple: true
         },
         {
-          name: "match",
-          label: _("For these files (executable or device)"),
+          name:     "match",
+          label:    _("For these files (executable or device)"),
           multiple: true
         },
         {
-          name: "priority",
-          label: _("With at least this priority"),
+          name:     "priority",
+          label:    _("With at least this priority"),
           multiple: false,
-          values: ["emerg", "alert", "crit", "err", "warning",
-                   "notice", "info", "debug"]
+          values:   ["emerg", "alert", "crit", "err", "warning",
+                     "notice", "info", "debug"]
         }
       ]
     end
@@ -166,9 +165,9 @@ module SystemdJournal
     # @return [Array<Hash>] for each column a :label and a :method is provided
     def columns
       [
-        {label: _("Time"), method: :formatted_time},
-        {label: _("Source"), method: :source},
-        {label: _("Message"), method: :message}
+        { label: _("Time"), method: :formatted_time },
+        { label: _("Source"), method: :source },
+        { label: _("Message"), method: :message }
       ]
     end
   end

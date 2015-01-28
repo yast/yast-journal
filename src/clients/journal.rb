@@ -16,6 +16,6 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'systemd_journal/entries_dialog'
+require "systemd_journal/entries_dialog"
 
 SystemdJournal::EntriesDialog.new.run

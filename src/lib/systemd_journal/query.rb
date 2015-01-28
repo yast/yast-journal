@@ -16,13 +16,12 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'systemd_journal/entry'
-require 'systemd_journal/journalctl'
+require "systemd_journal/entry"
+require "systemd_journal/journalctl"
 
 module SystemdJournal
   # A more convenient interface to journalctl options
   class Query
-
     VALID_FILTERS = ["unit", "priority", "match"]
 
     attr_reader :interval, :filters
@@ -47,9 +46,9 @@ module SystemdJournal
     #   repeated as many times as needed.
     # @see SystemdJournal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
-      unsupported = filters.keys.select {|k| !VALID_FILTERS.include?(k) }
+      unsupported = filters.keys.select { |k| !VALID_FILTERS.include?(k) }
       if !unsupported.empty?
-        raise "Unexpected filters for the query: #{unsupported.join(', ')}"
+        raise "Unexpected filters for the query: #{unsupported.join(", ")}"
       end
       @filters = filters
       @interval = interval
@@ -80,19 +79,23 @@ module SystemdJournal
     #  * offset: offset relative to the current boot
     #  * timestamps: timestamps of the first and last message for the boot
     def self.boots
-      Journalctl.new({"list-boots" => nil}, []).output.lines.map do |line|
+      Journalctl.new({ "list-boots" => nil }, []).output.lines.map do |line|
         # The 'journalctl --list-boots' output looks like this
         # -1 a07ac085b07d43d99b09ee9d146af240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
         #  0 24a9a89c43d34f859399f7994a233ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
         if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)$/
-          { id: $2, offset: $1, timestamps: $3 }
+          {
+            id:         Regexp.last_match[2],
+            offset:     Regexp.last_match[1],
+            timestamps: Regexp.last_match[3]
+          }
         else
           raise "Unexpected output for journalctl --list-boots: #{line}"
         end
       end
     end
 
-  private
+    private
 
     def calculate_options
       @journalctl_options = {}
@@ -111,7 +114,7 @@ module SystemdJournal
         end
       end
       # Remove empty time arguments
-      @journalctl_options.reject! {|k,v| v.nil? }
+      @journalctl_options.reject! { |_, v| v.nil? }
 
       # Add filters...
       @journalctl_options.merge!(@filters)
@@ -120,4 +123,3 @@ module SystemdJournal
     end
   end
 end
-

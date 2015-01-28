@@ -21,15 +21,14 @@ require_relative "spec_helper"
 require "systemd_journal/query"
 
 describe SystemdJournal::Query do
-
   describe "#entries" do
     it "returns a filtered set of entries" do
       query = SystemdJournal::Query.new
 
       expect(query).to receive(:journalctl_options).and_return("options")
       expect(query).to receive(:journalctl_matches).and_return("matches")
-      expect(SystemdJournal::Entry).to receive(:all).
-        with(options: "options", matches: "matches").and_return("entries")
+      expect(SystemdJournal::Entry).to receive(:all)
+        .with(options: "options", matches: "matches").and_return("entries")
       expect(query.entries).to eq("entries")
     end
   end
@@ -49,7 +48,7 @@ describe SystemdJournal::Query do
       let(:args) { { interval: "0dc+1" } }
 
       it "passes the value directly to 'boot'" do
-        expect(subject).to eq({"boot" => "0dc+1"})
+        expect(subject).to eq("boot" => "0dc+1")
       end
     end
 
@@ -62,29 +61,30 @@ describe SystemdJournal::Query do
     end
 
     context "when interval is an array with one element" do
-      let(:args) { { interval: [ "yesterday" ] } }
+      let(:args) { { interval: ["yesterday"] } }
 
       it "passes the value to 'since'" do
-        expect(subject).to eq({ "since" => "yesterday"})
+        expect(subject).to eq("since" => "yesterday")
       end
     end
 
     context "when interval is an array with two elements" do
-      let(:args) {
-        { interval: [ "yesterday", "today" ] }
-      }
+      let(:args) do
+        { interval: ["yesterday", "today"] }
+      end
 
       it "passes the values to 'since' and 'until'" do
-        expect(subject).to eq({ "since" => "yesterday", "until" => "today" })
+        expect(subject).to eq("since" => "yesterday", "until" => "today")
       end
     end
 
     context "when interval is an array with more than two elements" do
-      let(:args) { { interval: [ "yesterday", "today", "another" ] }
-      }
+      let(:args) do
+        { interval: ["yesterday", "today", "another"] }
+      end
 
       it "the surplus elements are ignored" do
-        expect(subject).to eq({ "since" => "yesterday", "until" => "today" })
+        expect(subject).to eq("since" => "yesterday", "until" => "today")
       end
     end
 
@@ -100,16 +100,17 @@ describe SystemdJournal::Query do
       let(:args) { { interval: { until: "today" } } }
 
       it "passes the value to 'until'" do
-        expect(subject).to eq({ "until" => "today" })
+        expect(subject).to eq("until" => "today")
       end
     end
 
     context "when interval is a hash with :until and :since" do
-      let(:args) {
-        { interval: { until: "today" , since: "yesterday" } } }
+      let(:args) do
+        { interval: { until: "today", since: "yesterday" } }
+      end
 
       it "passes the values to 'until' and 'since'" do
-        expect(subject).to eq({ "since" => "yesterday", "until" => "today" })
+        expect(subject).to eq("since" => "yesterday", "until" => "today")
       end
     end
 
@@ -130,15 +131,15 @@ describe SystemdJournal::Query do
     end
 
     context "when interval and filters are used" do
-      let(:args) {
+      let(:args) do
         {
           interval: -1,
-          filters: {
-            "unit" => ["two", "units"],
+          filters:  {
+            "unit"  => ["two", "units"],
             "match" => "a match"
           }
         }
-      }
+      end
 
       it "includes the valid filters" do
         expect(subject["unit"]).to eq(["two", "units"])
@@ -166,12 +167,12 @@ describe SystemdJournal::Query do
     end
 
     context "with non-empty filters" do
-      let(:filters) {
+      let(:filters) do
         {
-          "unit" => "an unit",
+          "unit"  => "an unit",
           "match" => "a match"
         }
-      }
+      end
 
       it "returns the value of the 'match' filter as an array" do
         expect(subject).to eq(["a match"])
@@ -183,34 +184,34 @@ describe SystemdJournal::Query do
     subject { SystemdJournal::Query.boots }
 
     before do
-      allow_to_execute(/journalctl --list-boots/).
-        and_return(cmd_result_for("list-boots-11"))
+      allow_to_execute(/journalctl --list-boots/)
+        .and_return(cmd_result_for("list-boots-11"))
     end
 
     it "returns an array of hashes" do
       expect(subject).to be_a(Array)
-      expect(subject.map {|b| b.class}.uniq).to eq([Hash])
+      expect(subject.map(&:class).uniq).to eq([Hash])
     end
 
     it "returns a Hash per boot entry" do
-      expect(subject.map {|b| b[:offset]}).
-        to eq(["-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0"])
+      expect(subject.map { |b| b[:offset] })
+        .to eq(["-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0"])
     end
 
     it "correctly maps every boot into three fields" do
       expect(subject.first).to eq(
-        {
-          offset: "-10",
-          id: "f02631731f744344859a5b7222d815d6",
+
+          offset:     "-10",
+          id:         "f02631731f744344859a5b7222d815d6",
           timestamps: "Wed 2014-10-01 21:12:23 CEST—Sun 2014-10-05 20:36:49 CEST"
-        }
+
       )
       expect(subject.last).to eq(
-        {
-          offset: "0",
-          id: "24a9a89c43d34f859399f7994a233ecf",
+
+          offset:     "0",
+          id:         "24a9a89c43d34f859399f7994a233ecf",
           timestamps: "Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET"
-        }
+
       )
     end
   end

@@ -16,9 +16,9 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'yast'
-require 'systemd_journal/query_presenter'
-require 'systemd_journal/query_dialog'
+require "yast"
+require "systemd_journal/query_presenter"
+require "systemd_journal/query_dialog"
 
 Yast.import "UI"
 Yast.import "Label"
@@ -27,7 +27,6 @@ Yast.import "Popup"
 module SystemdJournal
   # Dialog to display journal entries with several filtering options
   class EntriesDialog
-
     include Yast::UIShortcuts
     include Yast::I18n
     include Yast::Logger
@@ -39,7 +38,7 @@ module SystemdJournal
       @search = ""
       read_journal_entries
     end
-     
+
     # Displays the dialog
     def run
       return unless create_dialog
@@ -51,7 +50,7 @@ module SystemdJournal
       end
     end
 
-  private
+    private
 
     # Draws the dialog
     def create_dialog
@@ -106,7 +105,7 @@ module SystemdJournal
 
     # Table widget (plus wrappers) to display log entries
     def table
-      headers = @query.columns.map {|c| c[:label] }
+      headers = @query.columns.map { |c| c[:label] }
 
       Table(
         Id(:table),
@@ -119,14 +118,14 @@ module SystemdJournal
     def table_items
       # Reduce it to an array with only the visible fields
       entries_fields = @journal_entries.map do |entry|
-        @query.columns.map {|c| entry.send(c[:method]) }
+        @query.columns.map { |c| entry.send(c[:method]) }
       end
       # Grep for entries matching @search in any visible field
       entries_fields.select! do |fields|
-        fields.any? {|f| Regexp.new(@search, Regexp::IGNORECASE).match(f) }
+        fields.any? { |f| Regexp.new(@search, Regexp::IGNORECASE).match(f) }
       end
       # Return the result as an array of Items
-      entries_fields.map {|fields| Item(*fields) }
+      entries_fields.map { |fields| Item(*fields) }
     end
 
     def query_description

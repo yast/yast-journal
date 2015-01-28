@@ -21,7 +21,6 @@ require_relative "spec_helper"
 require "systemd_journal/journalctl"
 
 describe SystemdJournal::Journalctl do
-
   describe "#output" do
     subject { SystemdJournal::Journalctl.new.output }
 
@@ -38,9 +37,9 @@ describe SystemdJournal::Journalctl do
     end
 
     context "when journalctl reports 'Failed to determine timestamp'" do
-      let(:result) {
+      let(:result) do
         journalctl_error("Failed to determine timestamp: Cannot assign")
-      }
+      end
 
       it "returns an empty string" do
         expect(subject).to eq("")
@@ -48,9 +47,9 @@ describe SystemdJournal::Journalctl do
     end
 
     context "when journalctl reports 'Failed to get realtime timestamp'" do
-      let(:result) {
+      let(:result) do
         journalctl_error("Failed to get realtime timestamp: Cannot assign")
-      }
+      end
 
       it "returns an empty string" do
         expect(subject).to eq("")
@@ -58,12 +57,12 @@ describe SystemdJournal::Journalctl do
     end
 
     context "when journalctl reports an unexpected error" do
-      let(:result) {
+      let(:result) do
         journalctl_error("There are always more ways to crash")
-      }
+      end
 
       it "raises RuntimeError" do
-        expect{subject}.to raise_error(RuntimeError)
+        expect { subject }.to raise_error(RuntimeError)
       end
     end
   end
@@ -109,7 +108,7 @@ describe SystemdJournal::Journalctl do
       end
 
       context "when receiving an option with a time object" do
-        let(:option) { Time.new(2014,1,2,3,4,5) }
+        let(:option) { Time.new(2014, 1, 2, 3, 4, 5) }
 
         it "assigns the formatted time" do
           expect(subject).to match(/journalctl --option=\"2014-01-02 03:04:05\"/)
@@ -117,7 +116,7 @@ describe SystemdJournal::Journalctl do
       end
 
       context "when receiving an option with an array" do
-        let(:option) { ["value", Time.new(2014,1,2,3,4,5)] }
+        let(:option) { ["value", Time.new(2014, 1, 2, 3, 4, 5)] }
 
         it "includes the option as many times as needed" do
           expect(subject).to include('--option="2014-01-02 03:04:05"')

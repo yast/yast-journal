@@ -16,9 +16,9 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require 'yast'
-require 'systemd_journal/time_helpers'
-require 'systemd_journal/query_presenter'
+require "yast"
+require "systemd_journal/time_helpers"
+require "systemd_journal/query_presenter"
 
 Yast.import "UI"
 Yast.import "Label"
@@ -29,7 +29,6 @@ module SystemdJournal
   #
   # @see SystemdJournal::EntriesDialog
   class QueryDialog
-
     include Yast::UIShortcuts
     include Yast::I18n
     include TimeHelpers
@@ -57,18 +56,18 @@ module SystemdJournal
           raise "Unexpected input #{input}"
         end
       ensure
-          Yast::UI.CloseDialog
+        Yast::UI.CloseDialog
       end
     end
 
-  private
+    private
 
     # Translates the value of the widgets to a new QueryPresenter object
     def query_from_widgets
       interval = Yast::UI.QueryWidget(Id(:interval), :CurrentButton)
       if interval == "Hash"
         interval = {
-          since: time_from_widgets_for(:since), 
+          since: time_from_widgets_for(:since),
           until: time_from_widgets_for(:until)
         }
       end
@@ -129,7 +128,7 @@ module SystemdJournal
           widgets << HSpacing(1)
           widgets.concat(dates_widgets)
         end
-          
+
         Left(HBox(*widgets))
       end
     end
@@ -225,4 +224,3 @@ module SystemdJournal
     end
   end
 end
-
