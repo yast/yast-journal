@@ -25,10 +25,10 @@ module SystemdJournal
     VALID_FILTERS = ["unit", "priority", "match"]
 
     attr_reader :interval, :filters
-    # @return [Hash] options in the format expected by SystemdJournal::Journalctl
+    # @return [Hash] options in the format expected by Journalctl
     # @see SystemdJournal::Journalctl#initialize
     attr_reader :journalctl_options
-    # @return [Array] matches in the format expected by SystemdJournal::Journalctl
+    # @return [Array] matches in the format expected by Journalctl
     # @see SystemdJournal::Journalctl#initialize
     attr_reader :journalctl_matches
 
@@ -81,8 +81,9 @@ module SystemdJournal
     def self.boots
       Journalctl.new({ "list-boots" => nil }, []).output.lines.map do |line|
         # The 'journalctl --list-boots' output looks like this
-        # -1 a07ac085b07d43d99b09ee9d146af240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
-        #  0 24a9a89c43d34f859399f7994a233ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
+        # (slightly stripped down, see test/data for full-length examples)
+        # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
+        #  0 24a9a83ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
         if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)$/
           {
             id:         Regexp.last_match[2],

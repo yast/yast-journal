@@ -35,8 +35,11 @@ module SystemdJournal
 
       # Redefine default values
       query_args = {
-        interval: QueryPresenter.default_interval,
-        filters:  QueryPresenter.default_filters
+        interval: {
+          since: QueryPresenter.default_since,
+          until: QueryPresenter.default_until
+        },
+        filters:  {}
       }
       query_args.merge!(args)
 
@@ -63,14 +66,14 @@ module SystemdJournal
         _("With no additional conditions")
       else
         descriptions = []
-        if value = filters["unit"]
-          descriptions << _("units (%s)") % value.join(", ")
+        if filters["unit"]
+          descriptions << _("units (%s)") % filters["unit"].join(", ")
         end
-        if value = filters["match"]
-          descriptions << _("files (%s)") % value.join(", ")
+        if filters["match"]
+          descriptions << _("files (%s)") % filters["match"].join(", ")
         end
-        if value = filters["priority"]
-          descriptions << _("priority (%s)") % value
+        if filters["priority"]
+          descriptions << _("priority (%s)") % filters["priority"]
         end
         _("Filtering by %s") % descriptions.join(", ")
       end
@@ -98,14 +101,18 @@ module SystemdJournal
     #                 :value and :label
     def self.intervals
       boots = Query.boots
-      intervals = [
-        { value: Hash, label: _("Between these dates") },
-        { value: "0", label: _("Since system's boot (%s)") % boots.last[:timestamps] }
-      ]
+      intervals = []
+
+      intervals << { value: Hash, label: _("Between these dates") }
+
+      label = _("Since system's boot (%s)") % boots.last[:timestamps]
+      intervals << { value: "0", label: label }
+
       if boots.size > 1
         label = _("From previous boot (%s)") % boots[-2][:timestamps]
         intervals << { value: "-1", label: label }
       end
+
       intervals
     end
 
@@ -119,16 +126,6 @@ module SystemdJournal
     def self.default_until
       # Current time
       Time.now
-    end
-
-    # Default value for interval
-    def self.default_interval
-      { since: default_since, until: default_until }
-    end
-
-    # Default value for filters
-    def self.default_filters
-      {}
     end
 
     # Possible filters for a QueryPresenter object to be used in forms

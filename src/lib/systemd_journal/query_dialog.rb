@@ -75,13 +75,12 @@ module SystemdJournal
       filters = {}
       QueryPresenter.filters.each do |filter|
         name = filter[:name]
-        # If the checkbox is checked
-        if Yast::UI.QueryWidget(Id(name), :Value)
-          # Read the widget...
-          value = widget_to_filter(name, filter[:multiple])
-          # ...discarding empty values
-          filters[name] = value unless value.empty?
-        end
+        # Skip if the checkbox is not checked
+        next unless Yast::UI.QueryWidget(Id(name), :Value)
+        # Read the widget...
+        value = widget_to_filter(name, filter[:multiple])
+        # ...discarding empty values
+        filters[name] = value unless value.empty?
       end
 
       QueryPresenter.new(interval: interval, filters: filters)

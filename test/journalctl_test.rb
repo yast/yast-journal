@@ -111,7 +111,8 @@ describe SystemdJournal::Journalctl do
         let(:option) { Time.new(2014, 1, 2, 3, 4, 5) }
 
         it "assigns the formatted time" do
-          expect(subject).to match(/journalctl --option=\"2014-01-02 03:04:05\"/)
+          expect(subject)
+            .to match(/journalctl --option=\"2014-01-02 03:04:05\"/)
         end
       end
 

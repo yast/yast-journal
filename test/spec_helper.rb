@@ -37,7 +37,8 @@ end
 
 # Expect the execution of journalctl with the provided options and matches
 def expect_journalctl_with(*args)
-  expect(SystemdJournal::Journalctl).to receive(:new).with(*args).and_call_original
+  expect(SystemdJournal::Journalctl).to receive(:new)
+    .with(*args).and_call_original
   expect_to_execute(/journalctl/)
 end
 

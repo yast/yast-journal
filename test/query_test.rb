@@ -194,24 +194,21 @@ describe SystemdJournal::Query do
     end
 
     it "returns a Hash per boot entry" do
-      expect(subject.map { |b| b[:offset] })
-        .to eq(["-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0"])
+      expect(subject.map { |b| b[:offset] }).to eq(
+        ["-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0"]
+      )
     end
 
     it "correctly maps every boot into three fields" do
       expect(subject.first).to eq(
-
-          offset:     "-10",
-          id:         "f02631731f744344859a5b7222d815d6",
-          timestamps: "Wed 2014-10-01 21:12:23 CEST—Sun 2014-10-05 20:36:49 CEST"
-
+        offset:     "-10",
+        id:         "f02631731f744344859a5b7222d815d6",
+        timestamps: "Wed 2014-10-01 21:12:23 CEST—Sun 2014-10-05 20:36:49 CEST"
       )
       expect(subject.last).to eq(
-
-          offset:     "0",
-          id:         "24a9a89c43d34f859399f7994a233ecf",
-          timestamps: "Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET"
-
+        offset:     "0",
+        id:         "24a9a89c43d34f859399f7994a233ecf",
+        timestamps: "Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET"
       )
     end
   end

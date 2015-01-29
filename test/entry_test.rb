@@ -30,8 +30,10 @@ describe SystemdJournal::Entry do
         let(:args) { {} }
 
         it "invokes journalctl without filters" do
-          expect_journalctl_with({ "no-pager" => nil, "output" => "json" }, [])
-            .and_return(cmd_result_for("journalctl"))
+          expect_journalctl_with(
+            { "no-pager" => nil, "output" => "json" },
+            []
+          ).and_return(cmd_result_for("journalctl"))
           subject
         end
       end
@@ -40,8 +42,10 @@ describe SystemdJournal::Entry do
         let(:args) { { options: { "boot" => 0 } } }
 
         it "passes the arguments to journalctl" do
-          expect_journalctl_with({ "no-pager" => nil, "output" => "json", "boot" => 0 }, [])
-            .and_return(cmd_result_for("journalctl"))
+          expect_journalctl_with(
+            { "no-pager" => nil, "output" => "json", "boot" => 0 },
+            []
+          ).and_return(cmd_result_for("journalctl"))
           subject
         end
       end
@@ -50,8 +54,10 @@ describe SystemdJournal::Entry do
         let(:args) { { matches: ["/dev/sda"] } }
 
         it "passes the arguments to journalctl" do
-          expect_journalctl_with({ "no-pager" => nil, "output" => "json" }, ["/dev/sda"])
-            .and_return(cmd_result_for("journalctl"))
+          expect_journalctl_with(
+            { "no-pager" => nil, "output" => "json" },
+            ["/dev/sda"]
+          ).and_return(cmd_result_for("journalctl"))
           subject
         end
       end
