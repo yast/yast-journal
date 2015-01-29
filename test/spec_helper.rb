@@ -21,7 +21,7 @@ ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
 DATA_PATH = File.join(File.expand_path(File.dirname(__FILE__)), "data")
 
 require "yast"
-BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
+require "yast/rspec"
 
 # Stubbed result of calling a command
 def cmd_result_for(name)
@@ -44,12 +44,12 @@ end
 
 # Expect a command execution
 def expect_to_execute(cmd)
-  expect(Yast::SCR).to receive(:Execute).with(BASH_SCR_PATH, cmd)
+  expect(Yast::SCR).to receive(:Execute).with(path(".target.bash_output"), cmd)
 end
 
 # Stub a command execution
 def allow_to_execute(cmd)
-  allow(Yast::SCR).to receive(:Execute).with(BASH_SCR_PATH, cmd)
+  allow(Yast::SCR).to receive(:Execute).with(path(".target.bash_output"), cmd)
 end
 
 # JSON chunk describing a given entry, read from the example data directory
