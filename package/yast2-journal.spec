@@ -28,7 +28,8 @@ Requires:       yast2
 Requires:       yast2-ruby-bindings
 
 BuildRequires:  update-desktop-files
-BuildRequires:  yast2-ruby-bindings
+# First version with the RSpec extensions
+BuildRequires:  yast2-ruby-bindings >= 3.1.26
 BuildRequires:  yast2-devtools
 BuildRequires:  yast2
 #for install task
