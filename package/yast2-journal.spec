@@ -24,7 +24,8 @@ BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
-Requires:       yast2
+# First version with base Dialog class
+Requires:       yast2 >= 3.1.117
 Requires:       yast2-ruby-bindings
 
 BuildRequires:  update-desktop-files

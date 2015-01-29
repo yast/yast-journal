@@ -17,6 +17,7 @@
 #  you may find current contact information at www.suse.com
 
 require "yast"
+require "ui/dialog"
 require "systemd_journal/time_helpers"
 require "systemd_journal/query_presenter"
 
@@ -27,37 +28,48 @@ module SystemdJournal
   # Dialog allowing the user to set the query used to display the journal
   # entries in SystemdJournal::EntriesDialog
   #
+  # It returns a QueryPresenter object.
+  #
   # @see SystemdJournal::EntriesDialog
-  class QueryDialog
-    include Yast::UIShortcuts
-    include Yast::I18n
+  class QueryDialog < UI::Dialog
     include TimeHelpers
 
     INPUT_WIDTH = 20
 
     def initialize(query)
+      super()
       textdomain "systemd_journal"
       @query = query
     end
 
-    # Displays the dialog and returns user's selection of query options.
-    #
-    # @return [DialogFilter] nil if user cancelled
-    def run
-      return nil unless create_dialog
+    # Main layout
+    def dialog_content
+      VBox(
+        # Header
+        Heading(_("Entries to display")),
+        # Interval
+        Frame(
+          _("Time interval"),
+          interval_widget
+        ),
+        VSpacing(0.3),
+        # Filters
+        Frame(
+          _("Filters"),
+          filters_widget
+        ),
+        VSpacing(0.3),
+        # Footer buttons
+        HBox(
+          PushButton(Id(:cancel), Yast::Label.CancelButton),
+          PushButton(Id(:ok), Yast::Label.OKButton)
+        )
+      )
+    end
 
-      begin
-        case Yast::UI.UserInput
-        when :cancel
-          nil
-        when :ok
-          query_from_widgets
-        else
-          raise "Unexpected input #{input}"
-        end
-      ensure
-        Yast::UI.CloseDialog
-      end
+    # Event callback for the 'ok' button
+    def ok_handler
+      finish_dialog(query_from_widgets)
     end
 
     private
@@ -84,33 +96,6 @@ module SystemdJournal
       end
 
       QueryPresenter.new(interval: interval, filters: filters)
-    end
-
-    # Draws the dialog
-    def create_dialog
-      Yast::UI.OpenDialog(
-        VBox(
-          # Header
-          Heading(_("Entries to display")),
-          # Interval
-          Frame(
-            _("Time interval"),
-            interval_widget
-          ),
-          VSpacing(0.3),
-          # Filters
-          Frame(
-            _("Filters"),
-            filters_widget
-          ),
-          VSpacing(0.3),
-          # Footer buttons
-          HBox(
-            PushButton(Id(:cancel), Yast::Label.CancelButton),
-            PushButton(Id(:ok), Yast::Label.OKButton)
-          )
-        )
-      )
     end
 
     def interval_widget
