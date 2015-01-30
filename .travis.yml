@@ -3,11 +3,11 @@ before_install:
 # disable rvm, use system Ruby
 - rvm reset
 - wget https://raw.githubusercontent.com/yast/yast-devtools/master/travis-tools/travis_setup.sh
-- sh ./travis_setup.sh -p "yast2-devtools yast2" -g bundler
+- sh ./travis_setup.sh -p "yast2-devtools yast2 rake" -g "rspec:2.14.1 yast-rake gettext simplecov coveralls rubocop:0.28.0"
 script:
 - rake check:pot
 - rubocop
 - yardoc
-- COVERAGE=1 bundle exec rake test:unit
+- COVERAGE=1 rake test:unit
 - sudo rake install
 
