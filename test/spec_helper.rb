@@ -17,11 +17,29 @@
 #  you may find current contact information at www.suse.com
 
 # Set the paths
-ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
+SRC_PATH = File.expand_path("../../src", __FILE__)
 DATA_PATH = File.join(File.expand_path(File.dirname(__FILE__)), "data")
+ENV["Y2DIR"] = SRC_PATH
 
 require "yast"
 require "yast/rspec"
+
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start
+
+  # for coverage we need to load all ruby files
+  Dir["#{SRC_PATH}/lib/**/*.rb"].each { |f| require_relative f }
+
+  # use coveralls for on-line code coverage reporting at Travis CI
+  if ENV["TRAVIS"]
+    require "coveralls"
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+      SimpleCov::Formatter::HTMLFormatter,
+      Coveralls::SimpleCov::Formatter
+    ]
+  end
+end
 
 # Stubbed result of calling a command
 def cmd_result_for(name)
