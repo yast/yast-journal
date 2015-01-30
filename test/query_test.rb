@@ -21,15 +21,30 @@ require_relative "spec_helper"
 require "systemd_journal/query"
 
 describe SystemdJournal::Query do
-  describe "#entries" do
-    it "returns a filtered set of entries" do
+  describe "#execute" do
+    it "provides the right arguments to Entry.all" do
       query = SystemdJournal::Query.new
 
       expect(query).to receive(:journalctl_options).and_return("options")
       expect(query).to receive(:journalctl_matches).and_return("matches")
       expect(SystemdJournal::Entry).to receive(:all)
-        .with(options: "options", matches: "matches").and_return("entries")
+        .with(options: "options", matches: "matches")
+      query.execute
+    end
+  end
+
+  describe "#entries" do
+    let(:query) { SystemdJournal::Query.new }
+
+    it "returns the result of last call to #execute" do
+      allow(SystemdJournal::Entry).to receive(:all).and_return("entries")
+      query.execute
+
       expect(query.entries).to eq("entries")
+    end
+
+    it "returns an empty array if #execute has not being called yet" do
+      expect(query.entries).to eq([])
     end
   end
 

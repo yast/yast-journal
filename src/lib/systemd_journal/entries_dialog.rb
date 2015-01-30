@@ -33,8 +33,7 @@ module SystemdJournal
       textdomain "systemd_journal"
 
       @query = QueryPresenter.new
-      @search = ""
-      read_journal_entries
+      execute_query
     end
 
     # Main dialog layout
@@ -47,7 +46,7 @@ module SystemdJournal
           HBox(
             Label(_("Displaying entries with the following text")),
             HSpacing(1),
-            InputField(Id(:search), Opt(:hstretch, :notify), "", @search)
+            InputField(Id(:search), Opt(:hstretch, :notify), "", "")
           )
         ),
         ReplacePoint(Id(:query), query_description),
@@ -68,20 +67,19 @@ module SystemdJournal
     # Event callback for the 'change filter' button.
     def filter_handler
       return unless read_query
-      read_journal_entries
       redraw_query
+      execute_query
       redraw_table
     end
 
     # Event callback for change in the content of the search box
     def search_handler
-      read_search
       redraw_table
     end
 
     # Event callback for the 'refresh' button
     def refresh_handler
-      read_journal_entries
+      execute_query
       redraw_table
     end
 
@@ -100,13 +98,15 @@ module SystemdJournal
     end
 
     def table_items
+      search = Yast::UI.QueryWidget(Id(:search), :Value) || ""
+
       # Reduce it to an array with only the visible fields
-      entries_fields = @journal_entries.map do |entry|
+      entries_fields = @query.entries.map do |entry|
         @query.columns.map { |c| entry.send(c[:method]) }
       end
-      # Grep for entries matching @search in any visible field
+      # Grep for entries matching the search in any visible field
       entries_fields.select! do |fields|
-        fields.any? { |f| Regexp.new(@search, Regexp::IGNORECASE).match(f) }
+        fields.any? { |f| Regexp.new(search, Regexp::IGNORECASE).match(f) }
       end
       # Return the result as an array of Items
       entries_fields.map { |fields| Item(*fields) }
@@ -154,21 +154,13 @@ module SystemdJournal
       end
     end
 
-    # Gets the new search string from the interface
-    def read_search
-      @search = Yast::UI.QueryWidget(Id(:search), :Value)
-      log.info "Search string set to '#{@search}'"
-    end
-
     # Reads the journal entries from the system
-    def read_journal_entries
-      log.info "Calling journalctl with #{@query.journalctl_options} "\
-        "and #{@query.journalctl_matches}"
-      @journal_entries = @query.entries
-      log.info "Call to journalctl returned #{@journal_entries.size} entries."
+    def execute_query
+      log.info "Executing query #{@query.journalctl_options}"
+      @query.execute
+      log.info "Call to journalctl returned #{@query.entries.size} entries."
     rescue => e
       log.warn e.message
-      @journal_entries = []
       Yast::Popup.Message(e.message)
     end
   end
