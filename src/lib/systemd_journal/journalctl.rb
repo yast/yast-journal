@@ -25,6 +25,9 @@ module SystemdJournal
     COMMAND = "LANG=C journalctl"
     # Format understood by journalctl options
     TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+    # Ordered list of priority values supported by journalctl
+    PRIORITIES = ["emerg", "alert", "crit", "err",
+                  "warning", "notice", "info", "debug"]
 
     attr_reader :options, :matches
 

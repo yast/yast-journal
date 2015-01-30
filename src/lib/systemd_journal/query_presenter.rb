@@ -27,37 +27,6 @@ module SystemdJournal
     extend Yast::I18n
     textdomain "systemd_journal"
 
-    # Possible filters for a QueryPresenter object. For each filter there
-    # are 4 possible keys
-    #
-    #   * :name       name of the filter
-    #   * :label      short label for the filter
-    #   * :form_label label for the widget used to set the filter
-    #   * :multiple   boolean indicating if an array is a valid value
-    #   * :values     optional list of valid values
-    FILTERS = [
-      {
-        name:       "unit",
-        label:      _("Units"),
-        form_label: _("For these systemd units"),
-        multiple:   true
-      },
-      {
-        name:       "match",
-        label:      _("Files"),
-        form_label: _("For these files (executable or device)"),
-        multiple:   true
-      },
-      {
-        name:       "priority",
-        label:      _("Priority"),
-        form_label: _("With at least this priority"),
-        multiple:   false,
-        values:     ["emerg", "alert", "crit", "err", "warning",
-                     "notice", "info", "debug"]
-      }
-    ]
-
     # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 
@@ -96,7 +65,7 @@ module SystemdJournal
         _("With no additional conditions")
       else
         descriptions = []
-        QueryPresenter::FILTERS.each do |filter|
+        QueryPresenter.filters.each do |filter|
           value = filters[filter[:name]]
           next if value.nil?
           value = value.join(" ") if filter[:multiple]
@@ -141,6 +110,38 @@ module SystemdJournal
       end
 
       intervals
+    end
+
+    # Possible filters for a QueryPresenter object
+    #
+    # @return [Array<Hash>] for each filter there are 4 possible keys
+    #
+    #   * :name       name of the filter
+    #   * :label      short label for the filter
+    #   * :form_label label for the widget used to set the filter
+    #   * :multiple   boolean indicating if an array is a valid value
+    #   * :values     optional list of valid values
+    def self.filters
+      [
+        {
+          name:       "unit",
+          label:      _("Units"),
+          form_label: _("For these systemd units"),
+          multiple:   true
+        },
+        {
+          name:       "match",
+          label:      _("Files"),
+          form_label: _("For these files (executable or device)"),
+          multiple:   true
+        },
+        {
+          name:       "priority",
+          label:      _("Priority"),
+          form_label: _("With at least this priority"),
+          values:     Journalctl::PRIORITIES
+        }
+      ]
     end
 
     # Default value for interval[:since]

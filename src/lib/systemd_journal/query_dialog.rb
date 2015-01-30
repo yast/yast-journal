@@ -86,7 +86,7 @@ module SystemdJournal
       end
 
       filters = {}
-      QueryPresenter::FILTERS.each do |filter|
+      QueryPresenter.filters.each do |filter|
         name = filter[:name]
         # Skip if the checkbox is not checked
         next unless Yast::UI.QueryWidget(Id(name), :Value)
@@ -148,7 +148,7 @@ module SystemdJournal
 
     # Widget allowing to set the filters
     def filters_widget
-      filters = QueryPresenter::FILTERS.map do |filter|
+      filters = QueryPresenter.filters.map do |filter|
         name = filter[:name]
         Left(
           HBox(
