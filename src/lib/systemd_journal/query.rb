@@ -22,6 +22,7 @@ require "systemd_journal/journalctl"
 module SystemdJournal
   # A more convenient interface to journalctl options
   class Query
+    # Valid keys for the filter hash
     VALID_FILTERS = ["unit", "priority", "match"]
 
     attr_reader :interval, :filters
@@ -31,6 +32,8 @@ module SystemdJournal
     # @return [Array] matches in the format expected by Journalctl
     # @see SystemdJournal::Journalctl#initialize
     attr_reader :journalctl_matches
+    # @return [Array<Entry>] entries read in the last call to #execute
+    attr_reader :entries
 
     # Creates a new query based on the time interval and some additional filters
     #
@@ -58,17 +61,23 @@ module SystemdJournal
       else
         @journalctl_matches = [filters["match"]].flatten
       end
-
       calculate_options
+
+      @entries = []
     end
 
-    # Calls journalctl and returns an Array of Entry objects
-    def entries
-      Entry.all(options: journalctl_options, matches: journalctl_matches)
+    # Reads the list of entries from the system
+    def execute
+      @entries = Entry.all(
+        options: journalctl_options,
+        matches: journalctl_matches
+      )
     end
 
+    # Representation of the query as a string
     def to_s
-      "<interval: #{@interval}, filters: #{@filters}>"
+      "<interval: #{@interval}, filters: #{@filters}, journalctl_options: "\
+        "#{@journalctl_options}, journalctl_matches #{@journalctl_matches}>"
     end
 
     # Array of system's boots registered in the journal.
