@@ -47,7 +47,7 @@ module SystemdJournal
 
     # Reads the widgets representing a time
     #
-    # @returns [Time] Value specified by the user
+    # @return [Time] Value specified by the user
     def time_from_widgets_for(field)
       Time.parse(
         Yast::UI.QueryWidget(Id(:"#{field}_date"), :Value) +
