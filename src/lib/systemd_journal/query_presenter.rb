@@ -61,21 +61,17 @@ module SystemdJournal
 
     # User readable description of the current filters
     def filters_description
-      # FIXME: this is probably not i18n-friendly with all those commas.
       if filters.empty?
         _("With no additional conditions")
       else
         descriptions = []
-        if filters["unit"]
-          descriptions << _("units (%s)") % filters["unit"].join(", ")
+        QueryPresenter.filters.each do |filter|
+          value = filters[filter[:name]]
+          next if value.nil?
+          value = value.join(" ") if filter[:multiple]
+          descriptions << "#{filter[:label]} (#{value})"
         end
-        if filters["match"]
-          descriptions << _("files (%s)") % filters["match"].join(", ")
-        end
-        if filters["priority"]
-          descriptions << _("priority (%s)") % filters["priority"]
-        end
-        _("Filtering by %s") % descriptions.join(", ")
+        descriptions.join(" ")
       end
     end
 
@@ -116,6 +112,38 @@ module SystemdJournal
       intervals
     end
 
+    # Possible filters for a QueryPresenter object
+    #
+    # @return [Array<Hash>] for each filter there are 4 possible keys
+    #
+    #   * :name       name of the filter
+    #   * :label      short label for the filter
+    #   * :form_label label for the widget used to set the filter
+    #   * :multiple   boolean indicating if an array is a valid value
+    #   * :values     optional list of valid values
+    def self.filters
+      [
+        {
+          name:       "unit",
+          label:      _("Units"),
+          form_label: _("For these systemd units"),
+          multiple:   true
+        },
+        {
+          name:       "match",
+          label:      _("Files"),
+          form_label: _("For these files (executable or device)"),
+          multiple:   true
+        },
+        {
+          name:       "priority",
+          label:      _("Priority"),
+          form_label: _("With at least this priority"),
+          values:     Journalctl::PRIORITIES
+        }
+      ]
+    end
+
     # Default value for interval[:since]
     def self.default_since
       # 24 hours ago
@@ -126,35 +154,6 @@ module SystemdJournal
     def self.default_until
       # Current time
       Time.now
-    end
-
-    # Possible filters for a QueryPresenter object to be used in forms
-    #
-    # @return [Array<Hash>] for each filter there are 4 possible keys
-    #   * :name name of the filter
-    #   * :label label for the widget used to set the filter
-    #   * :multiple boolean indicating if an array is a valid value
-    #   * :values optional list of valid values
-    def self.filters
-      [
-        {
-          name:     "unit",
-          label:    _("For these systemd units"),
-          multiple: true
-        },
-        {
-          name:     "match",
-          label:    _("For these files (executable or device)"),
-          multiple: true
-        },
-        {
-          name:     "priority",
-          label:    _("With at least this priority"),
-          multiple: false,
-          values:   ["emerg", "alert", "crit", "err", "warning",
-                     "notice", "info", "debug"]
-        }
-      ]
     end
 
     # Fields to display for listing the entries
