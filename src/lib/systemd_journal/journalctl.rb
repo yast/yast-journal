@@ -19,8 +19,11 @@
 module SystemdJournal
   # Wrapper for journalctl invocation
   class Journalctl
+    # Agent used internally
     BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
+    # Base journalctl command
     COMMAND = "LANG=C journalctl"
+    # Format understood by journalctl options
     TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     attr_reader :options, :matches

@@ -13,3 +13,8 @@ Metrics/AbcSize:
 # journalctl output is UTF-8, so are the comments explaning it
 Style/AsciiComments:
   Enabled: false
+
+# The definition of the widgets takes many lines in the dialogs
+Metrics/ClassLength:
+  Exclude:
+    - 'src/lib/systemd_journal/query_dialog.rb'

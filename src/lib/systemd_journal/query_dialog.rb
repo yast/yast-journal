@@ -34,6 +34,7 @@ module SystemdJournal
   class QueryDialog < UI::Dialog
     include TimeHelpers
 
+    # Width of the input widgets for the filters
     INPUT_WIDTH = 20
 
     def initialize(query)
@@ -85,7 +86,7 @@ module SystemdJournal
       end
 
       filters = {}
-      QueryPresenter.filters.each do |filter|
+      QueryPresenter::FILTERS.each do |filter|
         name = filter[:name]
         # Skip if the checkbox is not checked
         next unless Yast::UI.QueryWidget(Id(name), :Value)
@@ -105,15 +106,16 @@ module SystemdJournal
     # Array of radio buttons to select the interval
     def interval_buttons
       QueryPresenter.intervals.map do |int|
-        selected = int[:value] === @query.interval
-        value = int[:value].to_s
-        widgets = [RadioButton(Id(value), int[:label], selected)]
-        if value == "Hash"
-          widgets << HSpacing(1)
-          widgets.concat(dates_widgets)
+        if int[:value] == Hash
+          selected = @query.interval.is_a?(Hash)
+          additional_widgets = [HSpacing(1)] + dates_widgets
+        else
+          selected = int[:value] == @query.interval
+          additional_widgets = []
         end
+        button = RadioButton(Id(int[:value].to_s), int[:label], selected)
 
-        Left(HBox(*widgets))
+        Left(HBox(button, *additional_widgets))
       end
     end
 
@@ -146,11 +148,11 @@ module SystemdJournal
 
     # Widget allowing to set the filters
     def filters_widget
-      filters = QueryPresenter.filters.map do |filter|
+      filters = QueryPresenter::FILTERS.map do |filter|
         name = filter[:name]
         Left(
           HBox(
-            CheckBox(Id(name), filter[:label], !@query.filters[name].nil?),
+            CheckBox(Id(name), filter[:form_label], !@query.filters[name].nil?),
             HSpacing(1),
             widget_for_filter(name, filter[:values])
           )

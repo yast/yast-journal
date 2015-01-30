@@ -26,6 +26,7 @@ module SystemdJournal
     attr_reader :raw, :timestamp, :uid, :gid, :pid, :process_name, :cmdline,
       :syslog_id, :unit, :machine_id, :hostname, :message
 
+    # Used internally to get the entries in a parseable format
     JOURNALCTL_OPTS = { "no-pager" => nil, "output" => "json" }
 
     def initialize(json)
