@@ -73,6 +73,14 @@ module SystemdJournal
       finish_dialog(query_from_widgets)
     end
 
+    # Event callbacks for changes in the filter fields
+    QueryPresenter.filters.each do |filter|
+      define_method(:"#{filter[:name]}_value_handler") do
+        # Check the corresponding checkbox for better usability
+        Yast::UI.ChangeWidget(Id(filter[:name]), :Value, true)
+      end
+    end
+
     private
 
     # Translates the value of the widgets to a new QueryPresenter object
@@ -174,9 +182,9 @@ module SystemdJournal
         items = values.map do |value|
           Item(Id(value), value, @query.filters[name] == value)
         end
-        ComboBox(id, "", items)
+        ComboBox(id, Opt(:notify), "", items)
       else
-        MinWidth(INPUT_WIDTH, InputField(id, "", filter_to_string(name)))
+        MinWidth(INPUT_WIDTH, InputField(id, Opt(:notify), "", filter_to_string(name)))
       end
     end
 
