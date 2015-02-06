@@ -25,24 +25,41 @@ module SystemdJournal
     #
     # The result depends on the used UI, since not all widgets are available
     # in all interfaces.
-    def time_widgets_for(field, value)
-      date = value.strftime("%Y-%m-%d")
+    def datetime_widgets_for(field, value)
+      [
+        date_widget_for(:"#{field}_date", value),
+        time_widget_for(:"#{field}_time", value)
+      ]
+    end
+
+    # Widget representing one time field (without the date part)
+    #
+    # The result depends on the used UI, since not all widgets are available
+    # in all interfaces.
+    def time_widget_for(field, value)
       time = value.strftime("%H:%M:%S")
-      widgets = []
+
+      # TimeField widget is not available in ncurses interface
+      if Yast::UI.HasSpecialWidget(:TimeField)
+        TimeField(Id(field), Opt(:notify), "", time)
+      else
+        MinWidth(9, InputField(Id(field), Opt(:notify), "", time))
+      end
+    end
+
+    # Widget representing one date field.
+    #
+    # The result depends on the used UI, since not all widgets are available
+    # in all interfaces.
+    def date_widget_for(field, value)
+      date = value.strftime("%Y-%m-%d")
 
       # DateField widget is not available in ncurses interface
       if Yast::UI.HasSpecialWidget(:DateField)
-        widgets << DateField(Id(:"#{field}_date"), "", date)
+        DateField(Id(field), Opt(:notify), "", date)
       else
-        widgets << MinWidth(11, InputField(Id(:"#{field}_date"), "", date))
+        MinWidth(11, InputField(Id(field), Opt(:notify), "", date))
       end
-      # TimeField widget is not available in ncurses interface
-      if Yast::UI.HasSpecialWidget(:TimeField)
-        widgets << TimeField(Id(:"#{field}_time"), "", time)
-      else
-        widgets << MinWidth(9, InputField(Id(:"#{field}_time"), "", time))
-      end
-      widgets
     end
 
     # Reads the widgets representing a time

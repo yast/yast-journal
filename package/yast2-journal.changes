@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Fri Feb  6 15:18:18 UTC 2015 - ancor@suse.com
 
-- Filters are activated on value changes (usability)
+- UI improvement: filters are activated on value changes
 - Some cleanup in the strings for better internationalization
 - Updated to use the latest version of the YaST libraries
 - 0.2.2
