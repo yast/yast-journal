@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Feb  6 15:18:18 UTC 2015 - ancor@suse.com
+
+- Filters are activated on value changes (usability)
+- Some cleanup in the strings for better internationalization
+- Updated to use the latest version of the YaST libraries
+- 0.2.2
+
+-------------------------------------------------------------------
 Tue Jan 27 08:34:17 UTC 2015 - ancor@suse.com
 
 - Only offer 'previous boot' as a time interval if there are really
