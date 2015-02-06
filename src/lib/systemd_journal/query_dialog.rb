@@ -73,6 +73,22 @@ module SystemdJournal
       finish_dialog(query_from_widgets)
     end
 
+    # Event callbacks for changes in the interval time widgets
+    [:until_date, :until_time, :since_date, :since_time].each do |widget|
+      define_method(:"#{widget}_handler") do
+        # Automatically select the dates-based interval
+        Yast::UI.ChangeWidget(Id(:interval), :CurrentButton, "Hash")
+      end
+    end
+
+    # Event callbacks for changes in the filter fields
+    QueryPresenter.filters.each do |filter|
+      define_method(:"#{filter[:name]}_value_handler") do
+        # Automatically check the corresponding checkbox
+        Yast::UI.ChangeWidget(Id(filter[:name]), :Value, true)
+      end
+    end
+
     private
 
     # Translates the value of the widgets to a new QueryPresenter object
@@ -122,9 +138,9 @@ module SystemdJournal
     # Array of widgets for selecting date/time thresholds
     def dates_widgets
       [
-        *time_widgets_for(:since, since_value),
+        *datetime_widgets_for(:since, since_value),
         Label("-"),
-        *time_widgets_for(:until, until_value)
+        *datetime_widgets_for(:until, until_value)
       ]
     end
 
@@ -174,9 +190,12 @@ module SystemdJournal
         items = values.map do |value|
           Item(Id(value), value, @query.filters[name] == value)
         end
-        ComboBox(id, "", items)
+        ComboBox(id, Opt(:notify), "", items)
       else
-        MinWidth(INPUT_WIDTH, InputField(id, "", filter_to_string(name)))
+        MinWidth(
+          INPUT_WIDTH,
+          InputField(id, Opt(:notify), "", filter_to_string(name))
+        )
       end
     end
 
