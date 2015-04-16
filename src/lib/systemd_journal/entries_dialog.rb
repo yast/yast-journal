@@ -20,6 +20,7 @@ require "yast"
 require "ui/dialog"
 require "systemd_journal/query_presenter"
 require "systemd_journal/query_dialog"
+require "ui/builder/slim"
 
 Yast.import "UI"
 Yast.import "Label"
@@ -27,7 +28,7 @@ Yast.import "Popup"
 
 module SystemdJournal
   # Dialog to display journal entries with several filtering options
-  class EntriesDialog < UI::Dialog
+  class EntriesDialog < YUI::Dialog
     def initialize
       super
       textdomain "systemd_journal"
@@ -37,26 +38,12 @@ module SystemdJournal
     end
 
     # Main dialog layout
-    def dialog_content
-      VBox(
-        # Header
-        Heading(_("Journal entries")),
-        # Filters
-        Left(
-          HBox(
-            Label(_("Displaying entries with the following text")),
-            HSpacing(1),
-            InputField(Id(:search), Opt(:hstretch, :notify), "", "")
-          )
-        ),
-        ReplacePoint(Id(:query), query_description),
-        VSpacing(0.3),
-        # Log entries
-        table,
-        VSpacing(0.3),
-        # Footer buttons
-        footer
-      )
+    ENTRIES_TEMPLATE = File.expand_path("../entries.yui", __FILE__)
+    def run
+      dialog = ::UI.slim(File.read(ENTRIES_TEMPLATE), self)
+      log.info "dialog #{dialog.inspect}"
+
+      event_loop
     end
 
     # Dialog options

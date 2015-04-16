@@ -31,7 +31,7 @@ module SystemdJournal
   # It returns a QueryPresenter object.
   #
   # @see SystemdJournal::EntriesDialog
-  class QueryDialog < UI::Dialog
+  class QueryDialog < YUI::Dialog
     include TimeHelpers
 
     # Width of the input widgets for the filters

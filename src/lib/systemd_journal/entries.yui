@@ -1,0 +1,23 @@
+main_dialog
+  vbox
+    label Journal entries
+    left
+      hbox
+        label Displaying entries with the following text
+        hspacing
+        hstretch
+        input_field id=:search notify=true = ""
+    replace_point id=:query
+      vbox
+        left
+          label = " - #{@query.interval_description}"
+        left
+          label = " - #{@query.filters_description}"
+    vspacing 0.3
+    vspacing 0.3
+    hbox
+      push_button id=:filter hweight=1 Change filter...
+      hstretch
+      push_button id=:refresh hweight=1 Refresh
+      hstretch
+      push_button id=:cancel hweight=1 Quit
