@@ -14,6 +14,7 @@ main_dialog
         left
           label = " - #{@query.filters_description}"
     vspacing 0.3
+    / there should be tablem but not yet supporte
     vspacing 0.3
     hbox
       push_button id=:filter hweight=1 Change filter...
