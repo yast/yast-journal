@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jun  8 10:55:13 UTC 2015 - ancor@suse.com
+
+- Include the package in SLE12-SP1 fate#318486
+
+-------------------------------------------------------------------
 Fri Feb  6 15:18:18 UTC 2015 - ancor@suse.com
 
 - UI improvement: filters are activated on value changes
