@@ -25,9 +25,17 @@ describe SystemdJournal::QueryDialog do
     Yast::UI.QueryWidget(Id(id), property)
   end
 
-  def input(value, after_doing: nil)
+  # Sends a user input to libyui, optionally running some code before.
+  #
+  # @param value [Symbol/String] the input expected by UI.UserInput
+  # @param pre_hook [Proc] code used to tie the expectations or any other
+  #   action to input events. For example, checking the final status of the
+  #   dialog before closing it. The effect of an input can be checked on the
+  #   pre_hook of the next one to make sure libyui has already applied all the
+  #   changes.
+  def send_user_input(value, pre_hook: nil)
     expect(Yast::UI).to receive(:UserInput) do
-      after_doing.call if after_doing
+      pre_hook.call if pre_hook
       value
     end
   end
@@ -50,9 +58,9 @@ describe SystemdJournal::QueryDialog do
 
   describe "#match_value_handler" do
     it "automatically checks the 'match' checkbox when value changes" do
-      input :match_value
-      input :ok,
-        after_doing: -> { expect(property("match", :Value)).to eq true }
+      send_user_input :match_value
+      send_user_input :ok,
+        pre_hook: -> { expect(property("match", :Value)).to eq true }
 
       dialog.run
     end
@@ -60,9 +68,9 @@ describe SystemdJournal::QueryDialog do
 
   describe "#unit_value_handler" do
     it "automatically checks the 'unit' checkbox when value changes" do
-      input :unit_value
-      input :ok,
-        after_doing: -> { expect(property("unit", :Value)).to eq true }
+      send_user_input :unit_value
+      send_user_input :ok,
+        pre_hook: -> { expect(property("unit", :Value)).to eq true }
 
       dialog.run
     end
@@ -70,9 +78,9 @@ describe SystemdJournal::QueryDialog do
 
   describe "#until_date_handler" do
     it "automatically checks the dates checkbox when 'until date' changes" do
-      input :until_date
-      input :ok,
-        after_doing: -> { expect(property(:interval, :CurrentButton)).to eq "Hash" }
+      send_user_input :until_date
+      send_user_input :ok,
+        pre_hook: -> { expect(property(:interval, :CurrentButton)).to eq "Hash" }
 
       dialog.run
     end
@@ -80,9 +88,9 @@ describe SystemdJournal::QueryDialog do
 
   describe "#since_time_handler" do
     it "automatically checks the dates checkbox when 'since time' changes" do
-      input :since_time
-      input :ok,
-        after_doing: -> { expect(property(:interval, :CurrentButton)).to eq "Hash" }
+      send_user_input :since_time
+      send_user_input :ok,
+        pre_hook: -> { expect(property(:interval, :CurrentButton)).to eq "Hash" }
 
       dialog.run
     end
