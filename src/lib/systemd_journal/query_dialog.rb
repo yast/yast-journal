@@ -39,7 +39,7 @@ module SystemdJournal
 
     def initialize(query)
       super()
-      textdomain "systemd_journal"
+      textdomain "journal"
       @query = query
     end
 

@@ -26,12 +26,12 @@ module SystemdJournal
   class QueryPresenter < SimpleDelegator
     include Yast::I18n
     extend Yast::I18n
-    textdomain "systemd_journal"
+    textdomain "journal"
 
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(args = {})
-      textdomain "systemd_journal"
+      textdomain "journal"
 
       # Redefine default values
       query_args = {

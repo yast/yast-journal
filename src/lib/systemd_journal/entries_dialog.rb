@@ -30,7 +30,7 @@ module SystemdJournal
   class EntriesDialog < UI::Dialog
     def initialize
       super
-      textdomain "systemd_journal"
+      textdomain "journal"
 
       @query = QueryPresenter.new
       execute_query
