@@ -10,6 +10,10 @@ Metrics/MethodLength:
 Metrics/AbcSize:
   Max: 20
 
+# We have agreed that 90 is still fine (it fits github view)
+Metrics/LineLength:
+  Max: 90
+
 # journalctl output is UTF-8, so are the comments explaning it
 Style/AsciiComments:
   Enabled: false
