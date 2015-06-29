@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jun 29 14:16:12 UTC 2015 - ancor@suse.com
+
+- Honor internationalization settings when displaying dates
+  (improvements for fate#318486).
+- 0.2.3
+
+-------------------------------------------------------------------
 Mon Jun  8 10:55:13 UTC 2015 - ancor@suse.com
 
 - Include the package in SLE12-SP1 fate#318486
