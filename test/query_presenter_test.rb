@@ -1,4 +1,4 @@
-#! rspec
+#! /usr/bin/rspec
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
