@@ -18,11 +18,11 @@
 
 require "systemd_journal/entry"
 require "delegate"
+require "yast"
 
 module SystemdJournal
   # Presenter for Entry adding useful methods for the dialogs
   class EntryPresenter < SimpleDelegator
-    # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(entry)
@@ -47,7 +47,7 @@ module SystemdJournal
 
     # User readable representation of the timestamp
     def formatted_time
-      timestamp.strftime(TIME_FORMAT)
+      Yast::Builtins.strftime(timestamp, TIME_FORMAT)
     end
   end
 end

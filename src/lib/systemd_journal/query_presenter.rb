@@ -19,6 +19,7 @@
 require "systemd_journal/query"
 require "systemd_journal/entry_presenter"
 require "delegate"
+require "yast"
 
 module SystemdJournal
   # Presenter for Query adding useful methods for the dialogs
@@ -27,7 +28,6 @@ module SystemdJournal
     extend Yast::I18n
     textdomain "systemd_journal"
 
-    # FIXME: using %b is not i18n-friendly
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(args = {})
@@ -84,8 +84,8 @@ module SystemdJournal
         _("From previous boot")
       else
         dates = {
-          since: interval[:since].strftime(TIME_FORMAT),
-          until: interval[:until].strftime(TIME_FORMAT)
+          since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
+          until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
         }
         _("Between %{since} and %{until}") % dates
       end
