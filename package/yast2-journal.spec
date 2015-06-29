@@ -26,11 +26,12 @@ Source0:        %{name}-%{version}.tar.bz2
 
 # First version with base Dialog class
 Requires:       yast2 >= 3.1.117
-Requires:       yast2-ruby-bindings
+# Yast::Builtins::strftime
+Requires:       yast2-ruby-bindings >= 3.1.38
 
 BuildRequires:  update-desktop-files
-# First version with the RSpec extensions
-BuildRequires:  yast2-ruby-bindings >= 3.1.26
+# Yast::Builtins::strftime
+BuildRequires:  yast2-ruby-bindings >= 3.1.38
 BuildRequires:  yast2-devtools
 BuildRequires:  yast2
 #for install task
