@@ -38,6 +38,9 @@ if ENV["COVERAGE"]
       SimpleCov::Formatter::HTMLFormatter,
       Coveralls::SimpleCov::Formatter
     ]
+    SimpleCov.start do
+      add_filter "/test/"
+    end
   end
 end
 
