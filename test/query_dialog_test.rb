@@ -46,6 +46,8 @@ if !ENV["TRAVIS"]
     end
 
     before(:each) do
+      Yast::UI.RunInTerminal("#open_ncurses")
+
       # Ensure initial status of the dialog:
       # all filter checkboxes unchecked...
       Yast::UI.ChangeWidget(Id("unit"), :Value, false)
@@ -53,6 +55,10 @@ if !ENV["TRAVIS"]
       Yast::UI.ChangeWidget(Id("priority"), :Value, false)
       # ...and interval set to 'since system's boot'
       Yast::UI.ChangeWidget(Id(:interval), :CurrentButton, "0")
+    end
+
+    after(:each) do
+      Yast::UI.RunInTerminal("#close_ncurses")
     end
 
     subject(:dialog) do
