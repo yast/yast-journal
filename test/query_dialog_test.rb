@@ -48,6 +48,10 @@ if !ENV["TRAVIS"]
     before(:each) do
       Yast::UI.RunInTerminal("#open_ncurses")
 
+      # The QueryPresenter needs to check the number of previous boots
+      allow_to_execute(/journalctl --list-boots/)
+        .and_return(cmd_result_for("list-boots-11"))
+
       # Ensure initial status of the dialog:
       # all filter checkboxes unchecked...
       Yast::UI.ChangeWidget(Id("unit"), :Value, false)
