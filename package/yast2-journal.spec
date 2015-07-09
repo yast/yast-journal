@@ -38,6 +38,8 @@ BuildRequires:  yast2
 BuildRequires:  rubygem(yast-rake)
 # for tests
 BuildRequires:  rubygem(rspec)
+# First version with Yast::UI.OpenUI
+BuildRequires:  libyui-ncurses >= 2.47.0
 
 Group:          System/YaST
 License:        GPL-2.0 or GPL-3.0

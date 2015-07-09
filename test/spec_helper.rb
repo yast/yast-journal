@@ -26,7 +26,9 @@ require "yast/rspec"
 
 if ENV["COVERAGE"]
   require "simplecov"
-  SimpleCov.start
+  SimpleCov.start do
+    add_filter "/test/"
+  end
 
   # for coverage we need to load all ruby files
   Dir["#{SRC_PATH}/lib/**/*.rb"].each { |f| require_relative f }
