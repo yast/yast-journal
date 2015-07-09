@@ -46,7 +46,7 @@ if !ENV["TRAVIS"]
     end
 
     before(:each) do
-      Yast::UI.RunInTerminal("#open_ncurses")
+      Yast::UI.OpenUI
 
       # The QueryPresenter needs to check the number of previous boots
       allow_to_execute(/journalctl --list-boots/)
@@ -62,7 +62,7 @@ if !ENV["TRAVIS"]
     end
 
     after(:each) do
-      Yast::UI.RunInTerminal("#close_ncurses")
+      Yast::UI.CloseUI
     end
 
     subject(:dialog) do
