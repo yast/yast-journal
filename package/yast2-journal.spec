@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        0.2.3
+Version:        3.1.1
 Release:        0
 BuildArch:      noarch
 
@@ -38,8 +38,8 @@ BuildRequires:  yast2
 BuildRequires:  rubygem(yast-rake)
 # for tests
 BuildRequires:  rubygem(rspec)
-# First version with Yast::UI.OpenUI
-BuildRequires:  libyui-ncurses >= 2.47.0
+# First version with Yast::UI.OpenUI and libyui-terminal
+BuildRequires:  libyui-ncurses >= 2.47.1
 
 Group:          System/YaST
 License:        GPL-2.0 or GPL-3.0
@@ -54,7 +54,8 @@ user-friendly way.
 %setup -n %{name}-%{version}
 
 %check
-rake test:unit
+# Enable UI tests in headless systems like Jenkins
+libyui-terminal rake test:unit
 
 %install
 rake install DESTDIR="%{buildroot}"
