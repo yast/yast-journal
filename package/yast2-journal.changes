@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Jul 31 13:18:29 UTC 2015 - ancor@suse.com
+
+- Synced version numbering with the rest of YaST modules (last
+  step for fate#318486).
+- Enhancements in automated tests and code quality.
+- 3.1.1
+
+-------------------------------------------------------------------
 Mon Jun 29 14:16:12 UTC 2015 - ancor@suse.com
 
 - Honor internationalization settings when displaying dates
