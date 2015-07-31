@@ -73,21 +73,26 @@ module SystemdJournal
       finish_dialog(query_from_widgets)
     end
 
-    # Event callbacks for changes in the interval time widgets
-    [:until_date, :until_time, :since_date, :since_time].each do |widget|
-      define_method(:"#{widget}_handler") do
-        # Automatically select the dates-based interval
-        Yast::UI.ChangeWidget(Id(:interval), :CurrentButton, "Hash")
+    # Registers the callbacks for changes in the UI
+    def self.define_event_callbacks
+      # Event callbacks for changes in the interval time widgets
+      [:until_date, :until_time, :since_date, :since_time].each do |widget|
+        define_method(:"#{widget}_handler") do
+          # Automatically select the dates-based interval
+          Yast::UI.ChangeWidget(Id(:interval), :CurrentButton, "Hash")
+        end
+      end
+
+      # Event callbacks for changes in the filter fields
+      QueryPresenter.filters.each do |filter|
+        define_method(:"#{filter[:name]}_value_handler") do
+          # Automatically check the corresponding checkbox
+          Yast::UI.ChangeWidget(Id(filter[:name]), :Value, true)
+        end
       end
     end
 
-    # Event callbacks for changes in the filter fields
-    QueryPresenter.filters.each do |filter|
-      define_method(:"#{filter[:name]}_value_handler") do
-        # Automatically check the corresponding checkbox
-        Yast::UI.ChangeWidget(Id(filter[:name]), :Value, true)
-      end
-    end
+    define_event_callbacks
 
     private
 
@@ -122,16 +127,35 @@ module SystemdJournal
     # Array of radio buttons to select the interval
     def interval_buttons
       QueryPresenter.intervals.map do |int|
-        if int[:value] == Hash
-          selected = @query.interval.is_a?(Hash)
-          additional_widgets = [HSpacing(1)] + dates_widgets
-        else
-          selected = int[:value] == @query.interval
-          additional_widgets = []
-        end
-        button = RadioButton(Id(int[:value].to_s), int[:label], selected)
+        Left(
+          HBox(
+            interval_button(int),
+            *interval_additional_widgets(int)
+          )
+        )
+      end
+    end
 
-        Left(HBox(button, *additional_widgets))
+    # Radio button to select a given interval
+    #
+    # @param int [Hash] interval as returned by QueryPresenter.intervals
+    def interval_button(int)
+      if int[:value] == Hash
+        selected = @query.interval.is_a?(Hash)
+      else
+        selected = int[:value] == @query.interval
+      end
+      RadioButton(Id(int[:value].to_s), int[:label], selected)
+    end
+
+    # Additional widgets to display after the radio button for a given interval
+    #
+    # @param int [Hash] interval as returned by QueryPresenter.intervals
+    def interval_additional_widgets(int)
+      if int[:value] == Hash
+        [HSpacing(1)] + dates_widgets
+      else
+        []
       end
     end
 
