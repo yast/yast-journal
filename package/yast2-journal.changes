@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Aug 18 13:47:54 UTC 2015 - ancor@suse.com
+
+- Handle strange journal entries with non-textual messages
+  (bnc#941655)
+- 3.1.2
+
+-------------------------------------------------------------------
 Fri Jul 31 13:18:29 UTC 2015 - ancor@suse.com
 
 - Synced version numbering with the rest of YaST modules (last
