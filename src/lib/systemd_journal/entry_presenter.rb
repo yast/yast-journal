@@ -49,5 +49,11 @@ module SystemdJournal
     def formatted_time
       Yast::Builtins.strftime(timestamp, TIME_FORMAT)
     end
+
+    # Message string
+    def message
+      # bnc#941655 was caused by this field being an array in journalctl's json
+      entry.message.to_s
+    end
   end
 end
