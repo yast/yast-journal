@@ -1,7 +1,5 @@
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
-Yast::Tasks.submit_to :sle12sp1
-
 
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of version 2 or 3 of the GNU General
@@ -19,6 +17,8 @@ Yast::Tasks.submit_to :sle12sp1
 #  you may find current contact information at www.suse.com
 
 require "yast/rake"
+
+Yast::Tasks.submit_to :sle12sp1
 
 Yast::Tasks.configuration do |conf|
   conf.skip_license_check << /test\/data\/*/
