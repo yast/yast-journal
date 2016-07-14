@@ -23,7 +23,7 @@ module SystemdJournal
   # A more convenient interface to journalctl options
   class Query
     # Valid keys for the filter hash
-    VALID_FILTERS = ["unit", "priority", "match"]
+    VALID_FILTERS = ["unit", "priority", "match"].freeze
 
     attr_reader :interval, :filters
     # @return [Hash] options in the format expected by Journalctl
@@ -56,10 +56,10 @@ module SystemdJournal
       @filters = filters
       @interval = interval
 
-      if filters["match"].nil?
-        @journalctl_matches = []
+      @journalctl_matches = if filters["match"].nil?
+        []
       else
-        @journalctl_matches = [filters["match"]].flatten
+        [filters["match"]].flatten
       end
       calculate_options
 
@@ -105,7 +105,7 @@ module SystemdJournal
       end
     end
 
-    private
+  private
 
     def calculate_options
       @journalctl_options = {}

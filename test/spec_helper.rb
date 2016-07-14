@@ -46,7 +46,7 @@ end
 # Stubbed result of calling a command
 def cmd_result_for(name)
   file = File.join(DATA_PATH, "#{name}.out")
-  content = File.open(file, encoding: "UTF-8") { |f| f.read }
+  content = File.open(file, encoding: "UTF-8", &:read)
   { "exit" => 0, "stderr" => "", "stdout" => content }
 end
 
@@ -75,5 +75,5 @@ end
 # JSON chunk describing a given entry, read from the example data directory
 def json_for(name)
   file = File.join(DATA_PATH, "#{name}-entry.json")
-  File.open(file, encoding: "UTF-8") { |f| f.read }
+  File.open(file, encoding: "UTF-8", &:read)
 end

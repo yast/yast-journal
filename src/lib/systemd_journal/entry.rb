@@ -27,7 +27,7 @@ module SystemdJournal
       :syslog_id, :unit, :machine_id, :hostname, :message
 
     # Used internally to get the entries in a parseable format
-    JOURNALCTL_OPTS = { "no-pager" => nil, "output" => "json" }
+    JOURNALCTL_OPTS = { "no-pager" => nil, "output" => "json" }.freeze
 
     def initialize(json)
       @raw = JSON.parse(json)

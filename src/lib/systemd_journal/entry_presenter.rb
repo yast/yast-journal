@@ -23,7 +23,7 @@ require "yast"
 module SystemdJournal
   # Presenter for Entry adding useful methods for the dialogs
   class EntryPresenter < SimpleDelegator
-    TIME_FORMAT = "%b %d %H:%M:%S"
+    TIME_FORMAT = "%b %d %H:%M:%S".freeze
 
     def initialize(entry)
       __setobj__(entry)
