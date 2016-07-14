@@ -94,7 +94,7 @@ module SystemdJournal
 
     define_event_callbacks
 
-    private
+  private
 
     # Translates the value of the widgets to a new QueryPresenter object
     def query_from_widgets
@@ -140,10 +140,10 @@ module SystemdJournal
     #
     # @param int [Hash] interval as returned by QueryPresenter.intervals
     def interval_button(int)
-      if int[:value] == Hash
-        selected = @query.interval.is_a?(Hash)
+      selected = if int[:value] == Hash
+        @query.interval.is_a?(Hash)
       else
-        selected = int[:value] == @query.interval
+        int[:value] == @query.interval
       end
       RadioButton(Id(int[:value].to_s), int[:label], selected)
     end

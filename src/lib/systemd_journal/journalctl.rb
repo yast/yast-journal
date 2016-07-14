@@ -22,12 +22,12 @@ module SystemdJournal
     # Agent used internally
     BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
     # Base journalctl command
-    COMMAND = "LANG=C journalctl"
+    COMMAND = "LANG=C journalctl".freeze
     # Format understood by journalctl options
-    TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+    TIME_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
     # Ordered list of priority values supported by journalctl
     PRIORITIES = ["emerg", "alert", "crit", "err",
-                  "warning", "notice", "info", "debug"]
+                  "warning", "notice", "info", "debug"].freeze
 
     attr_reader :options, :matches
 
@@ -67,17 +67,15 @@ module SystemdJournal
 
       if cmd_result["exit"].zero?
         cmd_result["stdout"]
+      elsif cmd_result["stderr"] =~ /^Failed to .* timestamp:/
+        # Most likely, journalctl bug when an empty list is found
+        ""
       else
-        if cmd_result["stderr"] =~ /^Failed to .* timestamp:/
-          # Most likely, journalctl bug when an empty list is found
-          ""
-        else
-          raise "Calling journalctl failed: #{cmd_result["stderr"]}"
-        end
+        raise "Calling journalctl failed: #{cmd_result["stderr"]}"
       end
     end
 
-    private
+  private
 
     def options_string
       return @options_string if @option_string

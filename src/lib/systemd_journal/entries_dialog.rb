@@ -83,7 +83,7 @@ module SystemdJournal
       redraw_table
     end
 
-    private
+  private
 
     # Table widget (plus wrappers) to display log entries
     def table

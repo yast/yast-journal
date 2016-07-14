@@ -28,7 +28,7 @@ module SystemdJournal
     extend Yast::I18n
     textdomain "journal"
 
-    TIME_FORMAT = "%b %d %H:%M:%S"
+    TIME_FORMAT = "%b %d %H:%M:%S".freeze
 
     def initialize(args = {})
       textdomain "journal"
