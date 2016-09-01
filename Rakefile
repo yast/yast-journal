@@ -2,7 +2,6 @@
 #  All Rights Reserved.
 Yast::Tasks.submit_to :sle12sp2
 
-
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of version 2 or 3 of the GNU General
 #  Public License as published by the Free Software Foundation.
