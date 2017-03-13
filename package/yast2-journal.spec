@@ -67,5 +67,6 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/journal.desktop
 
 %doc COPYING
+%doc README.md
 
 %build
