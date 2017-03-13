@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        3.1.2
+Version:        3.2.0
 Release:        0
 BuildArch:      noarch
 
@@ -67,5 +67,6 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/journal.desktop
 
 %doc COPYING
+%doc README.md
 
 %build
