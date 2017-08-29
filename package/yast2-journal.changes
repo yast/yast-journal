@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 29 10:04:29 UTC 2017 - knut.anderssen@suse.com
+
+- Escape special search query characters (bsc#1055500)
+- 3.2.1
+
+-------------------------------------------------------------------
 Mon Mar 13 09:42:03 UTC 2017 - ancor@suse.com
 
 - Fixed RPM packaging error (bsc#1029088)

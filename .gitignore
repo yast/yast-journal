@@ -1,0 +1,4 @@
+*.pot
+/coverage/
+.yardoc/
+doc/
