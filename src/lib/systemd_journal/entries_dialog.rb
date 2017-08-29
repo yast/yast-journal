@@ -98,7 +98,7 @@ module SystemdJournal
     end
 
     def table_items
-      search = Yast::UI.QueryWidget(Id(:search), :Value) || ""
+      search = Regexp.escape(Yast::UI.QueryWidget(Id(:search), :Value) || "")
 
       # Reduce it to an array with only the visible fields
       entries_fields = @query.entries.map do |entry|
