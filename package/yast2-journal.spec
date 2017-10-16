@@ -43,7 +43,7 @@ BuildRequires:  libyui-ncurses >= 2.47.1
 
 Group:          System/YaST
 License:        GPL-2.0 or GPL-3.0
-Url:            https://github.com/ancorgs/yast-journal
+Url:            https://github.com/yast/yast-journal
 Summary:        YaST2 - Reading of systemd journal
 
 %description
