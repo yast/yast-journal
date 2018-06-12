@@ -29,7 +29,7 @@ module SystemdJournal
   # log viewer.
   #
   # @example how to display logs for tftp server for current boot
-  #   entries = SystemdJournal::Entry.all(options: {"unit" => "tftp", "boot" => nil})
+  #   entries = SystemdJournal::Entry.all(options: {"unit" => ["tftp.service", "tftp.socket"], "boot" => nil})
   #   SystemdJournal::JournalViewer.new(entries).run
   #
   class JournalViewer < UI::Dialog
