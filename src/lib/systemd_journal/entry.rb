@@ -24,7 +24,7 @@ module SystemdJournal
   # An entry in the systemd journal
   class Entry
     attr_reader :raw, :timestamp, :uid, :gid, :pid, :process_name, :cmdline,
-      :syslog_id, :unit, :machine_id, :hostname, :message
+      :syslog_id, :unit, :machine_id, :hostname, :message, :priority
 
     # Used internally to get the entries in a parseable format
     JOURNALCTL_OPTS = { "no-pager" => nil, "output" => "json" }.freeze
@@ -37,10 +37,11 @@ module SystemdJournal
       @process_name = @raw["_COMM"]
       @cmdline = @raw["_CMDLINE"]
       @syslog_id = @raw["SYSLOG_IDENTIFIER"]
-      @unit = @raw["_SYSTEMD_UNIT"]
+      @unit = @raw["UNIT"]
       @machine_id = @raw["_MACHINE_ID"]
       @hostname = @raw["_HOSTNAME"]
       @message = @raw["MESSAGE"]
+      @priority = @raw["PRIORITY"]
       @timestamp = Time.at(@raw["__REALTIME_TIMESTAMP"].to_f / 1_000_000)
     end
 

@@ -7,4 +7,5 @@ params = Yast::WFM.Args
 raise "missing param for log entries" if params.empty?
 
 entries = SystemdJournal::Entry.all(options: {"unit" => params, "boot" => nil})
-SystemdJournal::JournalViewer.new(entries).run
+fields = SystemdJournal::JournalViewer.default_fields_map.merge(unit: "Unit", priority: "Priority")
+SystemdJournal::JournalViewer.new(entries, headline: "TFTP log", fields_map: fields).run

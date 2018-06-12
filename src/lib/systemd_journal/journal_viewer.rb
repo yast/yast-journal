@@ -30,17 +30,23 @@ module SystemdJournal
   #
   # @example how to display logs for tftp server for current boot
   #   entries = SystemdJournal::Entry.all(options: {"unit" => ["tftp.service", "tftp.socket"], "boot" => nil})
-  #   SystemdJournal::JournalViewer.new(entries).run
+  #   # add also unit to field map to see what is from socket and what is from service
+  #   fields = SystemdJournal::JournalViewer.default_fields_map.merge(
+  #     unit: "Unit"
+  #     priority: "Priority"
+  #   )
+  #   SystemdJournal::JournalViewer.new(entries, headline: "TFTP log", fields_map: fields).run
   #
   class JournalViewer < UI::Dialog
     extend Yast::I18n
 
-    def initialize(entries, headline: nil)
+    def initialize(entries, headline: nil, fields_map: nil)
       super()
       textdomain "journal"
 
       @headline = headline || _("Journal entries")
       @entries = entries
+      @fields_map = fields_map || self.class.default_fields_map
     end
 
     # Main dialog layout
@@ -62,18 +68,26 @@ module SystemdJournal
       Opt(:decorated, :defaultsize)
     end
 
-  private
+    def self.default_fields_map
+      textdomain "journal"
 
-    FIELDS_MAP = {
-      formatted_time: _("Time"),
-      message:        _("Log Entry")
-    }
-    FIELDS =  FIELDS_MAP.keys
-    HEADERS = FIELDS_MAP.values
+      {
+        formatted_time: _("Time"),
+        message:        _("Log Entry")
+      }
+    end
+
+  protected
+
+    attr_reader :headline
+    attr_reader :entries
+    attr_reader :fields_map
+
+  private
 
     # Table widget (plus wrappers) to display log entries
     def table
-      headers = HEADERS.map { |h| _(h) }
+      headers = fields_map.values
 
       Table(
         Id(:table),
@@ -87,7 +101,14 @@ module SystemdJournal
       entries_presenters = @entries.map { |e| EntryPresenter.new(e) }
       # Return the result as an array of Items
       entries_presenters.map do |entry|
-        fields = FIELDS.map { |f| entry.public_send(f) }
+        fields = fields_map.keys.map do |field|
+          # allow to use methods from presenter and also entry itself
+          if entry.respond_to?(field)
+            entry.public_send(field)
+          else
+            entry.entry.public_send(field)
+          end
+        end
         Item(*fields)
       end
     end
