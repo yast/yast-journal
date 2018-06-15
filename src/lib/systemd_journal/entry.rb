@@ -29,19 +29,27 @@ module SystemdJournal
     # Used internally to get the entries in a parseable format
     JOURNALCTL_OPTS = { "no-pager" => nil, "output" => "json" }.freeze
 
+    JSON_MAPPING = {
+      uid:          "_UID",
+      gid:          "_GID",
+      pid:          "_PID",
+      process_name: "_COMM",
+      cmdline:      "_CMDLINE",
+      syslog_id:    "SYSLOG_IDENTIFIER",
+      unit:         "UNIT",
+      machine_id:   "_MACHINE_ID",
+      hostname:     "_HOSTNAME",
+      message:      "MESSAGE",
+      priority:     "PRIORITY"
+    }.freeze
+
+    private_constant :JSON_MAPPING
+
     def initialize(json)
       @raw = JSON.parse(json)
-      @uid = @raw["_UID"]
-      @gid = @raw["_GID"]
-      @pid = @raw["_PID"]
-      @process_name = @raw["_COMM"]
-      @cmdline = @raw["_CMDLINE"]
-      @syslog_id = @raw["SYSLOG_IDENTIFIER"]
-      @unit = @raw["UNIT"]
-      @machine_id = @raw["_MACHINE_ID"]
-      @hostname = @raw["_HOSTNAME"]
-      @message = @raw["MESSAGE"]
-      @priority = @raw["PRIORITY"]
+      JSON_MAPPING.each_pair do |variable, json_key|
+        instance_variable_set(:"@#{variable}", @raw[json_key])
+      end
       @timestamp = Time.at(@raw["__REALTIME_TIMESTAMP"].to_f / 1_000_000)
     end
 
