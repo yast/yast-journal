@@ -28,11 +28,11 @@ Yast.import "Popup"
 module SystemdJournal
   # Dialog to display journal entries with several filtering options
   class EntriesDialog < UI::Dialog
-    def initialize
-      super
+    def initialize(query: nil)
+      super()
       textdomain "journal"
 
-      @query = QueryPresenter.new
+      @query = query || QueryPresenter.new
       execute_query
     end
 
