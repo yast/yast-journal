@@ -30,20 +30,21 @@ module SystemdJournal
 
     TIME_FORMAT = "%b %d %H:%M:%S".freeze
 
-    def initialize(args = {})
+    def initialize(query = nil)
       textdomain "journal"
 
-      # Redefine default values
-      query_args = {
-        interval: {
-          since: QueryPresenter.default_since,
-          until: QueryPresenter.default_until
-        },
-        filters:  {}
-      }
-      query_args.merge!(args)
+      if !query
+        # Redefine default values
+        query_args = {
+          interval: {
+            since: QueryPresenter.default_since,
+            until: QueryPresenter.default_until
+          },
+          filters:  {}
+        }
 
-      query = Query.new(query_args)
+        query = Query.new(query_args)
+      end
       __setobj__(query)
     end
 

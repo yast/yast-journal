@@ -33,7 +33,7 @@ module SystemdJournal
       super()
       textdomain "journal"
 
-      @query = query || QueryPresenter.new
+      @query = QueryPresenter.new(query)
       execute_query
     end
 

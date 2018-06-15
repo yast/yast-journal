@@ -117,7 +117,7 @@ module SystemdJournal
         filters[name] = value unless value.empty?
       end
 
-      QueryPresenter.new(interval: interval, filters: filters)
+      QueryPresenter.new(Query.new(interval: interval, filters: filters))
     end
 
     def interval_widget
