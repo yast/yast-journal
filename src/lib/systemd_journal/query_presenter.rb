@@ -83,12 +83,16 @@ module SystemdJournal
         _("Since system's boot")
       when "-1"
         _("From previous boot")
-      else
+      when Hash
         dates = {
           since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
           until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
         }
         _("Between %{since} and %{until}") % dates
+      when nil
+        _("No time restriction")
+      else
+        raise "Unexpected interval value #{interval.inspect}"
       end
     end
 
