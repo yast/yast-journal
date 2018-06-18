@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        4.0.0
+Version:        4.1.0
 Release:        0
 BuildArch:      noarch
 
