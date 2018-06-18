@@ -30,20 +30,21 @@ module SystemdJournal
 
     TIME_FORMAT = "%b %d %H:%M:%S".freeze
 
-    def initialize(args = {})
+    def initialize(query = nil)
       textdomain "journal"
 
-      # Redefine default values
-      query_args = {
-        interval: {
-          since: QueryPresenter.default_since,
-          until: QueryPresenter.default_until
-        },
-        filters:  {}
-      }
-      query_args.merge!(args)
+      if !query
+        # Redefine default values
+        query_args = {
+          interval: {
+            since: QueryPresenter.default_since,
+            until: QueryPresenter.default_until
+          },
+          filters:  {}
+        }
 
-      query = Query.new(query_args)
+        query = Query.new(query_args)
+      end
       __setobj__(query)
     end
 
@@ -82,12 +83,16 @@ module SystemdJournal
         _("Since system's boot")
       when "-1"
         _("From previous boot")
-      else
+      when Hash
         dates = {
           since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
           until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
         }
         _("Between %{since} and %{until}") % dates
+      when nil
+        _("No time restriction")
+      else
+        raise "Unexpected interval value #{interval.inspect}"
       end
     end
 

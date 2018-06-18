@@ -30,8 +30,7 @@ if ENV["COVERAGE"]
     add_filter "/test/"
   end
 
-  # for coverage we need to load all ruby files
-  Dir["#{SRC_PATH}/lib/**/*.rb"].each { |f| require_relative f }
+  SimpleCov.track_files("#{SRC_PATH}/**/*.rb")
 
   # use coveralls for on-line code coverage reporting at Travis CI
   if ENV["TRAVIS"]

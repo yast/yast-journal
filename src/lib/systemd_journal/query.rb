@@ -37,10 +37,11 @@ module SystemdJournal
 
     # Creates a new query based on the time interval and some additional filters
     #
-    # @param interval [Array,Hash,#to_s] Time interval, can take several forms:
+    # @param interval [Array,Hash,#to_s,nil] Time interval, can take several forms:
     #   * Array of two elements with starting and ending time
     #   * Hash with two possible keys :since and :until
     #   * An scalar value to be passed to the --boot argument of journalctl
+    #   * Nil which means no time restriction
     #   In the first two cases, the values can be Time objects or strings of
     #   any format accepted by journalctl for --until and --since
     # @param filters [Hash] The keys must match one of the VALID_FILTERS.
