@@ -32,7 +32,7 @@ describe SystemdJournal::EntriesDialog do
 
   describe "#initialize" do
     it "can get optional query" do
-      expect{described_class.new(query: query)}.to_not raise_error
+      expect { described_class.new(query: query) }.to_not raise_error
     end
 
     it "executes query" do
