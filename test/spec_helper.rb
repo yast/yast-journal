@@ -30,7 +30,7 @@ if ENV["COVERAGE"]
     add_filter "/test/"
   end
 
-  SimpleCov.track_files("#{src_location}/**/*.rb")
+  SimpleCov.track_files("#{SRC_PATH}/**/*.rb")
 
   # use coveralls for on-line code coverage reporting at Travis CI
   if ENV["TRAVIS"]
