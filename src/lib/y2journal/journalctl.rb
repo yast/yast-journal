@@ -16,7 +16,7 @@
 #  To contact SUSE about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-module SystemdJournal
+module Y2Journal
   # Wrapper for journalctl invocation
   class Journalctl
     # Agent used internally

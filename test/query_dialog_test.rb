@@ -18,10 +18,10 @@
 #  you may find current contact information at www.suse.com
 
 require_relative "spec_helper"
-require "systemd_journal/query_dialog"
+require "y2journal/query_dialog"
 
 if !ENV["TRAVIS"]
-  describe SystemdJournal::QueryDialog do
+  describe Y2Journal::QueryDialog do
     def property(id, property)
       Yast::UI.QueryWidget(Id(id), property)
     end
@@ -66,8 +66,8 @@ if !ENV["TRAVIS"]
     end
 
     subject(:dialog) do
-      query_presenter = SystemdJournal::QueryPresenter.new
-      SystemdJournal::QueryDialog.new(query_presenter)
+      query_presenter = Y2Journal::QueryPresenter.new
+      Y2Journal::QueryDialog.new(query_presenter)
     end
 
     describe "#match_value_handler" do

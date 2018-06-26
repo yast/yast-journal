@@ -18,14 +18,14 @@
 
 require "yast"
 require "ui/dialog"
-require "systemd_journal/query_presenter"
-require "systemd_journal/query_dialog"
+require "y2journal/query_presenter"
+require "y2journal/query_dialog"
 
 Yast.import "UI"
 Yast.import "Label"
 Yast.import "Popup"
 
-module SystemdJournal
+module Y2Journal
   # Dialog to display journal entries with several filtering options
   class EntriesDialog < UI::Dialog
     # @param query [Query] optional initial query
@@ -138,9 +138,9 @@ module SystemdJournal
       Yast::UI.ChangeWidget(Id(:table), :Items, table_items)
     end
 
-    # Asks the user the new query options using SystemdJournal::QueryDialog.
+    # Asks the user the new query options using Y2Journal::QueryDialog.
     #
-    # @see SystemdJournal::QueryDialog
+    # @see Y2Journal::QueryDialog
     #
     # @return [Boolean] true whether the query has changed
     def read_query

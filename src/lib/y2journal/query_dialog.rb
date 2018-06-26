@@ -18,19 +18,19 @@
 
 require "yast"
 require "ui/dialog"
-require "systemd_journal/time_helpers"
-require "systemd_journal/query_presenter"
+require "y2journal/time_helpers"
+require "y2journal/query_presenter"
 
 Yast.import "UI"
 Yast.import "Label"
 
-module SystemdJournal
+module Y2Journal
   # Dialog allowing the user to set the query used to display the journal
-  # entries in SystemdJournal::EntriesDialog
+  # entries in Y2Journal::EntriesDialog
   #
   # It returns a QueryPresenter object.
   #
-  # @see SystemdJournal::EntriesDialog
+  # @see Y2Journal::EntriesDialog
   class QueryDialog < UI::Dialog
     include TimeHelpers
 

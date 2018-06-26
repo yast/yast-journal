@@ -16,10 +16,10 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require "systemd_journal/entry"
-require "systemd_journal/journalctl"
+require "y2journal/entry"
+require "y2journal/journalctl"
 
-module SystemdJournal
+module Y2Journal
   # A more convenient interface to journalctl options
   class Query
     # Valid keys for the filter hash
@@ -27,10 +27,10 @@ module SystemdJournal
 
     attr_reader :interval, :filters
     # @return [Hash] options in the format expected by Journalctl
-    # @see SystemdJournal::Journalctl#initialize
+    # @see Y2Journal::Journalctl#initialize
     attr_reader :journalctl_options
     # @return [Array] matches in the format expected by Journalctl
-    # @see SystemdJournal::Journalctl#initialize
+    # @see Y2Journal::Journalctl#initialize
     attr_reader :journalctl_matches
     # @return [Array<Entry>] entries read in the last call to #execute
     attr_reader :entries
@@ -48,7 +48,7 @@ module SystemdJournal
     #   The values are scalars or arrays with the value for the corresponding
     #   journalctl argument. If the value is an Array, the argument will be
     #   repeated as many times as needed.
-    # @see SystemdJournal::Journalctl#initialize
+    # @see Y2Journal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
       unsupported = filters.keys.select { |k| !VALID_FILTERS.include?(k) }
       if !unsupported.empty?

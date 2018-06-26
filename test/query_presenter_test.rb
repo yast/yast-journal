@@ -18,10 +18,10 @@
 #  you may find current contact information at www.suse.com
 
 require_relative "spec_helper"
-require "systemd_journal/query_presenter"
+require "y2journal/query_presenter"
 
-describe SystemdJournal::QueryPresenter do
-  let(:presenter) { SystemdJournal::QueryPresenter.new }
+describe Y2Journal::QueryPresenter do
+  let(:presenter) { Y2Journal::QueryPresenter.new }
 
   describe "#entries" do
     let(:query) { presenter.query }
@@ -29,11 +29,11 @@ describe SystemdJournal::QueryPresenter do
 
     before do
       allow(query).to receive(:entries)
-        .and_return([SystemdJournal::Entry.new(json_for("nfs"))])
+        .and_return([Y2Journal::Entry.new(json_for("nfs"))])
     end
 
     it "returns an array of EntryPresenter objects" do
-      expect(subject.map(&:class)).to eq([SystemdJournal::EntryPresenter])
+      expect(subject.map(&:class)).to eq([Y2Journal::EntryPresenter])
     end
 
     it "delegates the fetching to its query" do
@@ -50,7 +50,7 @@ describe SystemdJournal::QueryPresenter do
   end
 
   describe ".intervals" do
-    subject { SystemdJournal::QueryPresenter.intervals }
+    subject { Y2Journal::QueryPresenter.intervals }
 
     it "returns three options if there are enough boots" do
       allow_to_execute(/journalctl --list-boots/)

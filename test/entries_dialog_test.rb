@@ -18,12 +18,12 @@
 #  you may find current contact information at www.suse.com
 
 require_relative "spec_helper"
-require "systemd_journal/entries_dialog"
-require "systemd_journal/query"
+require "y2journal/entries_dialog"
+require "y2journal/query"
 
-describe SystemdJournal::EntriesDialog do
+describe Y2Journal::EntriesDialog do
   let(:query) do
-    query = SystemdJournal::Query.new
+    query = Y2Journal::Query.new
     allow(query).to receive(:execute)
     allow(query).to receive(:entries).and_return([])
     query

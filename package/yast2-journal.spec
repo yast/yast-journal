@@ -63,7 +63,7 @@ rake install DESTDIR="%{buildroot}"
 %files
 %defattr(-,root,root)
 %{yast_dir}/clients/*.rb
-%{yast_dir}/lib/systemd_journal
+%{yast_dir}/lib
 %{yast_desktopdir}/journal.desktop
 
 %doc COPYING

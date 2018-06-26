@@ -18,26 +18,26 @@
 #  you may find current contact information at www.suse.com
 
 require_relative "spec_helper"
-require "systemd_journal/query"
+require "y2journal/query"
 
-describe SystemdJournal::Query do
+describe Y2Journal::Query do
   describe "#execute" do
     it "provides the right arguments to Entry.all" do
-      query = SystemdJournal::Query.new
+      query = Y2Journal::Query.new
 
       expect(query).to receive(:journalctl_options).and_return("options")
       expect(query).to receive(:journalctl_matches).and_return("matches")
-      expect(SystemdJournal::Entry).to receive(:all)
+      expect(Y2Journal::Entry).to receive(:all)
         .with(options: "options", matches: "matches")
       query.execute
     end
   end
 
   describe "#entries" do
-    let(:query) { SystemdJournal::Query.new }
+    let(:query) { Y2Journal::Query.new }
 
     it "returns the result of last call to #execute" do
-      allow(SystemdJournal::Entry).to receive(:all).and_return("entries")
+      allow(Y2Journal::Entry).to receive(:all).and_return("entries")
       query.execute
 
       expect(query.entries).to eq("entries")
@@ -49,7 +49,7 @@ describe SystemdJournal::Query do
   end
 
   describe "#journalctl_options" do
-    subject { SystemdJournal::Query.new(args).journalctl_options }
+    subject { Y2Journal::Query.new(args).journalctl_options }
 
     context "when both arguments are nil" do
       let(:args) { {} }
@@ -171,7 +171,7 @@ describe SystemdJournal::Query do
   end
 
   describe "#journalctl_matches" do
-    subject { SystemdJournal::Query.new(filters: filters).journalctl_matches }
+    subject { Y2Journal::Query.new(filters: filters).journalctl_matches }
 
     context "with empty filters" do
       let(:filters) { {} }
@@ -196,7 +196,7 @@ describe SystemdJournal::Query do
   end
 
   describe ".boots" do
-    subject { SystemdJournal::Query.boots }
+    subject { Y2Journal::Query.boots }
 
     before do
       allow_to_execute(/journalctl --list-boots/)

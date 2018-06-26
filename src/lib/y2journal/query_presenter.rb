@@ -16,12 +16,12 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require "systemd_journal/query"
-require "systemd_journal/entry_presenter"
+require "y2journal/query"
+require "y2journal/entry_presenter"
 require "delegate"
 require "yast"
 
-module SystemdJournal
+module Y2Journal
   # Presenter for Query adding useful methods for the dialogs
   class QueryPresenter < SimpleDelegator
     include Yast::I18n
