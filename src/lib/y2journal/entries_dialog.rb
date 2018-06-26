@@ -27,6 +27,15 @@ Yast.import "Popup"
 
 module Y2Journal
   # Dialog to display journal entries with several filtering options
+  #
+  # This dialog can also be used to only show the logs of a specific service
+  # (e.g., tftp-server module uses it to show journal entries for tftp-server).
+  # To do that the dialog needs to be created using a query with proper filters,
+  # see {Y2Journal::Query}.
+  #
+  # Note that even when the dialog is created to show the logs of a specific
+  # service, the user still has the option for changing the filters options,
+  # so the usage of the dialog is not limited in any case.
   class EntriesDialog < UI::Dialog
     # @param query [Query] optional initial query
     def initialize(query: nil)
