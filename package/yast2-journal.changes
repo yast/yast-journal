@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun 26 13:23:35 UTC 2018 - jlopez@suse.com
+
+- Change namespace according to YaST naming conventions. Now this
+  package uses Y2Journal (needed for fate#319428).
+- 4.1.1
+
+-------------------------------------------------------------------
 Mon Jun 18 14:21:20 UTC 2018 - jreidinger@suse.com
 
 - Allow to reuse journal viewer from other yast modules
