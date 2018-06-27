@@ -18,9 +18,9 @@
 
 require "json"
 require "yast"
-require "systemd_journal/journalctl"
+require "y2journal/journalctl"
 
-module SystemdJournal
+module Y2Journal
   # An entry in the systemd journal
   class Entry
     attr_reader :raw, :timestamp, :uid, :gid, :pid, :process_name, :cmdline,

@@ -16,11 +16,11 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require "systemd_journal/entry"
+require "y2journal/entry"
 require "delegate"
 require "yast"
 
-module SystemdJournal
+module Y2Journal
   # Presenter for Entry adding useful methods for the dialogs
   class EntryPresenter < SimpleDelegator
     TIME_FORMAT = "%b %d %H:%M:%S".freeze

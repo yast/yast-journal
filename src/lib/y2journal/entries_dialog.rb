@@ -18,15 +18,24 @@
 
 require "yast"
 require "ui/dialog"
-require "systemd_journal/query_presenter"
-require "systemd_journal/query_dialog"
+require "y2journal/query_presenter"
+require "y2journal/query_dialog"
 
 Yast.import "UI"
 Yast.import "Label"
 Yast.import "Popup"
 
-module SystemdJournal
+module Y2Journal
   # Dialog to display journal entries with several filtering options
+  #
+  # This dialog can also be used to only show the logs of a specific service
+  # (e.g., tftp-server module uses it to show journal entries for tftp-server).
+  # To do that the dialog needs to be created using a query with proper filters,
+  # see {Y2Journal::Query}.
+  #
+  # Note that even when the dialog is created to show the logs of a specific
+  # service, the user still has the option for changing the filters options,
+  # so the usage of the dialog is not limited in any case.
   class EntriesDialog < UI::Dialog
     # @param query [Query] optional initial query
     def initialize(query: nil)
@@ -138,9 +147,9 @@ module SystemdJournal
       Yast::UI.ChangeWidget(Id(:table), :Items, table_items)
     end
 
-    # Asks the user the new query options using SystemdJournal::QueryDialog.
+    # Asks the user the new query options using Y2Journal::QueryDialog.
     #
-    # @see SystemdJournal::QueryDialog
+    # @see Y2Journal::QueryDialog
     #
     # @return [Boolean] true whether the query has changed
     def read_query

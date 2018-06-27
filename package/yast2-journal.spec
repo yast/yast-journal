@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        4.1.0
+Version:        4.1.1
 Release:        0
 BuildArch:      noarch
 
@@ -63,7 +63,7 @@ rake install DESTDIR="%{buildroot}"
 %files
 %defattr(-,root,root)
 %{yast_dir}/clients/*.rb
-%{yast_dir}/lib/systemd_journal
+%{yast_dir}/lib
 %{yast_desktopdir}/journal.desktop
 
 %doc COPYING

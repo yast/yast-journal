@@ -18,13 +18,13 @@
 #  you may find current contact information at www.suse.com
 
 require_relative "spec_helper"
-require "systemd_journal/entry_presenter"
+require "y2journal/entry_presenter"
 
-describe SystemdJournal::EntryPresenter do
-  let(:entry) { SystemdJournal::Entry.new(json_for("nfs")) }
+describe Y2Journal::EntryPresenter do
+  let(:entry) { Y2Journal::Entry.new(json_for("nfs")) }
 
   describe "delegation" do
-    subject { SystemdJournal::EntryPresenter.new(entry) }
+    subject { Y2Journal::EntryPresenter.new(entry) }
 
     # Just some examples
     [:raw, :uid, :timestamp, :message].each do |method|
@@ -36,7 +36,7 @@ describe SystemdJournal::EntryPresenter do
   end
 
   describe "#formatted_time" do
-    subject { SystemdJournal::EntryPresenter.new(entry).formatted_time }
+    subject { Y2Journal::EntryPresenter.new(entry).formatted_time }
 
     it "returns a string including the time" do
       time = entry.timestamp.strftime("%H:%M:%S")

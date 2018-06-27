@@ -18,7 +18,7 @@
 
 require "time"
 
-module SystemdJournal
+module Y2Journal
   # Commodity methods for dealing with time fields in the dialogs
   module TimeHelpers
     # Array of widgets representing one time field.

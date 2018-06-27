@@ -21,4 +21,4 @@ Style/AsciiComments:
 # The definition of the widgets takes many lines in the dialogs
 Metrics/ClassLength:
   Exclude:
-    - 'src/lib/systemd_journal/query_dialog.rb'
+    - 'src/lib/y2journal/query_dialog.rb'

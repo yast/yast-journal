@@ -19,11 +19,11 @@
 
 require "time"
 require_relative "spec_helper"
-require "systemd_journal/entry"
+require "y2journal/entry"
 
-describe SystemdJournal::Entry do
+describe Y2Journal::Entry do
   describe ".all" do
-    subject { SystemdJournal::Entry.all(args) }
+    subject { Y2Journal::Entry.all(args) }
 
     describe "journalctl invocation" do
       context "when called with no options or matches" do
@@ -76,7 +76,7 @@ describe SystemdJournal::Entry do
       end
 
       it "returns an array of Entry objects" do
-        expect(subject.all? { |e| e.is_a?(SystemdJournal::Entry) }).to eq(true)
+        expect(subject.all? { |e| e.is_a?(Y2Journal::Entry) }).to eq(true)
       end
 
       it "honours the entries order" do
@@ -88,7 +88,7 @@ describe SystemdJournal::Entry do
   end
 
   describe "#initialize" do
-    subject { SystemdJournal::Entry.new(json) }
+    subject { Y2Journal::Entry.new(json) }
     let(:json) { json_for(entry) }
     # Any entry will work for most general tests
     let(:entry) { "nfs" }

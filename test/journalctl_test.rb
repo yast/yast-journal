@@ -18,11 +18,11 @@
 #  you may find current contact information at www.suse.com
 
 require_relative "spec_helper"
-require "systemd_journal/journalctl"
+require "y2journal/journalctl"
 
-describe SystemdJournal::Journalctl do
+describe Y2Journal::Journalctl do
   describe "#output" do
-    subject { SystemdJournal::Journalctl.new.output }
+    subject { Y2Journal::Journalctl.new.output }
 
     before do
       allow_to_execute(/journalctl/).and_return(result)
@@ -68,7 +68,7 @@ describe SystemdJournal::Journalctl do
   end
 
   describe "#command" do
-    subject { SystemdJournal::Journalctl.new(options, matches).command }
+    subject { Y2Journal::Journalctl.new(options, matches).command }
 
     describe "generation of journalctl matches" do
       let(:options) { {} }
