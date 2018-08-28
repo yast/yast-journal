@@ -16,6 +16,8 @@
 #  To contact SUSE about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
+require "systemd_journal/journalctl_exception"
+
 module SystemdJournal
   # Wrapper for journalctl invocation
   class Journalctl
@@ -71,7 +73,7 @@ module SystemdJournal
         # Most likely, journalctl bug when an empty list is found
         ""
       else
-        raise "Calling journalctl failed: #{cmd_result["stderr"]}"
+        raise JournalctlException, cmd_result["stderr"]
       end
     end
 
