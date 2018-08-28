@@ -77,3 +77,12 @@ def json_for(name)
   file = File.join(DATA_PATH, "#{name}-entry.json")
   File.open(file, encoding: "UTF-8", &:read)
 end
+
+# configure RSpec
+RSpec.configure do |config|
+  config.mock_with :rspec do |c|
+    # verify that the mocked methods are really defined
+    # https://relishapp.com/rspec/rspec-mocks/v/3-0/docs/verifying-doubles/partial-doubles
+    c.verify_partial_doubles = true
+  end
+end
