@@ -20,6 +20,7 @@ require "yast"
 require "ui/dialog"
 require "systemd_journal/query_presenter"
 require "systemd_journal/query_dialog"
+require "systemd_journal/journalctl_exception"
 
 Yast.import "UI"
 Yast.import "Label"
@@ -152,6 +153,8 @@ module SystemdJournal
         log.info "QueryDialog returned nil. Query is still #{@query}."
         false
       end
+    rescue JournalctlException => e
+      journalctl_failed(e.message)
     end
 
     # Reads the journal entries from the system
@@ -159,9 +162,19 @@ module SystemdJournal
       log.info "Executing query #{@query.journalctl_options}"
       @query.execute
       log.info "Call to journalctl returned #{@query.entries.size} entries."
-    rescue => e
-      log.warn e.message
-      Yast::Popup.Message(e.message)
+    rescue JournalctlException => e
+      journalctl_failed(e.message)
+    end
+
+    #
+    # Report a journalctl failure to the user.
+    #
+    # @param details [String] details of the failure
+    #
+    def journalctl_failed(details)
+      log.warn "journalctl failed, displaying empty result"
+      # TRANSLATORS: an error message, running the "journalctl" command has failed
+      Yast::Popup.MessageDetails(_("Reading the journal entries failed."), details)
     end
   end
 end
