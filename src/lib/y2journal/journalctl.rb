@@ -16,6 +16,8 @@
 #  To contact SUSE about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
+require "y2journal/journalctl_exception"
+
 module Y2Journal
   # Wrapper for journalctl invocation
   class Journalctl
@@ -71,7 +73,7 @@ module Y2Journal
         # Most likely, journalctl bug when an empty list is found
         ""
       else
-        raise "Calling journalctl failed: #{cmd_result["stderr"]}"
+        raise JournalctlException, cmd_result["stderr"]
       end
     end
 

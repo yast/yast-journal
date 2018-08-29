@@ -20,10 +20,11 @@ require "yast"
 require "ui/dialog"
 require "y2journal/query_presenter"
 require "y2journal/query_dialog"
+require "y2journal/journalctl_exception"
+require "yast2/popup.rb"
 
 Yast.import "UI"
 Yast.import "Label"
-Yast.import "Popup"
 
 module Y2Journal
   # Dialog to display journal entries with several filtering options
@@ -162,6 +163,9 @@ module Y2Journal
         log.info "QueryDialog returned nil. Query is still #{@query}."
         false
       end
+    rescue JournalctlException => e
+      journalctl_failed(e.message)
+      false
     end
 
     # Reads the journal entries from the system
@@ -169,9 +173,18 @@ module Y2Journal
       log.info "Executing query #{@query.journalctl_options}"
       @query.execute
       log.info "Call to journalctl returned #{@query.entries.size} entries."
-    rescue => e
-      log.warn e.message
-      Yast::Popup.Message(e.message)
+    rescue JournalctlException => e
+      journalctl_failed(e.message)
+    end
+
+    #
+    # Report a journalctl failure to the user.
+    #
+    # @param details [String] details of the failure
+    #
+    def journalctl_failed(details)
+      log.warn "journalctl failed, displaying empty result"
+      Yast2::Popup.show(_("Reading the journal entries failed."), details: details)
     end
   end
 end
