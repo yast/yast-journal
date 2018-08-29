@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Aug 28 11:17:02 UTC 2018 - lslezak@suse.cz
+
+- Do not crash when changing the filter as a non-root user
+  (bsc#1089626)
+- 4.1.2
+
+-------------------------------------------------------------------
 Tue Jun 26 13:23:35 UTC 2018 - jlopez@suse.com
 
 - Change namespace according to YaST naming conventions. Now this

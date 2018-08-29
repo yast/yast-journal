@@ -28,6 +28,9 @@ describe Y2Journal::EntriesDialog do
     allow(query).to receive(:entries).and_return([])
     query
   end
+
+  # journalctl error message
+  let(:details) { "failed!" }
   subject { described_class.new(query: query) }
 
   describe "#initialize" do
@@ -51,6 +54,21 @@ describe Y2Journal::EntriesDialog do
   describe "#dialog_options" do
     it "returns Term" do
       expect(subject.dialog_options).to be_a(Yast::Term)
+    end
+  end
+
+  describe "#filter_handler" do
+    it "reports an error when journalctl fails" do
+      expect_any_instance_of(Y2Journal::QueryDialog).to receive(:run)
+        .and_raise(Y2Journal::JournalctlException, details)
+      expect(Yast2::Popup).to receive(:show).with(anything, details: details)
+
+      # mock the other methods
+      allow(subject).to receive(:redraw_query)
+      allow(subject).to receive(:execute_query)
+      allow(subject).to receive(:redraw_table)
+
+      expect { subject.filter_handler }.to_not raise_error
     end
   end
 end
