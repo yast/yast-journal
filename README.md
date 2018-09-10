@@ -11,8 +11,8 @@ user-friendly way.
 ### Notes
 
 - This module can be used by non-root users. By default the non-root users
-  do not have the permission to read the journal, to allow specific users
-  reading the journal add them to the `systemd-journal` user group.
+  do not have the permission to read all journals, to allow specific users
+  reading everything add them to the `systemd-journal` user group.
 
 Further information
 -------------------
