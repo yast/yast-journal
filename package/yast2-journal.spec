@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        4.1.2
+Version:        4.1.3
 Release:        0
 BuildArch:      noarch
 
@@ -38,8 +38,10 @@ BuildRequires:  yast2
 BuildRequires:  rubygem(yast-rake)
 # for tests
 BuildRequires:  rubygem(rspec)
-# First version with Yast::UI.OpenUI and libyui-terminal
+# First version with Yast::UI.OpenUI
 BuildRequires:  libyui-ncurses >= 2.47.1
+# libyui-terminal
+BuildRequires:  libyui-ncurses-tools
 
 Group:          System/YaST
 License:        GPL-2.0 or GPL-3.0
