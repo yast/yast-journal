@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 25 13:30:09 UTC 2018 - mvidner@suse.com
+
+- Adjust for libyui-ncurses-tools split (bsc#1113291)
+- 4.1.3
+
+-------------------------------------------------------------------
 Tue Aug 28 11:17:02 UTC 2018 - lslezak@suse.cz
 
 - Do not crash when changing the filter as a non-root user
