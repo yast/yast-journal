@@ -14,7 +14,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=
 
-Icon=yast-messages
+Icon=yast-journal
 Exec=/sbin/yast2 journal
 
 Name=Systemd Journal

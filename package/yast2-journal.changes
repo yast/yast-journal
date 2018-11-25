@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sun Nov 25 16:06:43 UTC 2018 - Stasiek Michalski <hellcp@mailbox.org>
+
+- Provide icon with module (boo#1109310)
+- 4.1.4
+
+-------------------------------------------------------------------
 Thu Oct 25 13:30:09 UTC 2018 - mvidner@suse.com
 
 - Adjust for libyui-ncurses-tools split (bsc#1113291)
