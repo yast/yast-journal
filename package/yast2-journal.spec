@@ -67,7 +67,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_dir}/clients/*.rb
 %{yast_dir}/lib
 %{yast_desktopdir}/journal.desktop
-%{_datadir}/icons/*
+%{yast_icondir}
 
 %doc COPYING
 %doc README.md
