@@ -22,4 +22,5 @@ Yast::Tasks.configuration do |conf|
   conf.skip_license_check << /test\/data\/*/
   # Desktop files are just metadata
   conf.skip_license_check << /.*desktop$/
+  conf.skip_license_check << /.*svg$/
 end
