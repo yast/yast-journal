@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec  7 08:57:35 UTC 2018 - jreidinger@suse.com
+
+- always use absolute path to binaries (bsc#1118291)
+- properly escape shell arguments (bsc#1118291)
+- 4.1.5
+
+-------------------------------------------------------------------
 Sun Nov 25 16:06:43 UTC 2018 - Stasiek Michalski <hellcp@mailbox.org>
 
 - Provide icon with module (boo#1109310)
