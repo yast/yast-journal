@@ -121,7 +121,7 @@ describe Y2Journal::Journalctl do
 
         it "includes the option as many times as needed" do
           expect(subject).to include('--option=2014-01-02\\ 03:04:05')
-          expect(subject).to include('--option=value')
+          expect(subject).to include("--option=value")
         end
       end
     end
