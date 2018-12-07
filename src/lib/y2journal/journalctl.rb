@@ -17,14 +17,13 @@
 #  you may find current contact information at www.suse.com
 
 require "y2journal/journalctl_exception"
+require "shellwords"
 
 module Y2Journal
   # Wrapper for journalctl invocation
   class Journalctl
     # Agent used internally
     BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
-    # Base journalctl command
-    COMMAND = "LANG=C journalctl".freeze
     # Format understood by journalctl options
     TIME_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
     # Ordered list of priority values supported by journalctl
@@ -60,7 +59,7 @@ module Y2Journal
 
     # Full journalctl command
     def command
-      "#{COMMAND} #{options_string} #{matches_string}".strip.squeeze(" ")
+      "LANG=C /usr/bin/journalctl #{options_string} #{matches_string}".strip.squeeze(" ")
     end
 
     # Output resulting of executing the command
@@ -84,14 +83,14 @@ module Y2Journal
       strings = []
       @options.each_pair do |option, value|
         if value.nil?
-          strings << "--#{option}"
+          strings << "--#{option.to_s.shellescape}"
         else
           # In order to handle options with multiple values, make sure it's an
           # array and remove nils (they make no sense with multiple values)
           values = [value].flatten.compact
           values.each do |v|
             v = v.strftime(TIME_FORMAT) if v.respond_to?(:strftime)
-            strings << "--#{option}=\"#{v}\""
+            strings << "--#{option.to_s.shellescape}=#{v.to_s.shellescape}"
           end
         end
       end
@@ -99,7 +98,7 @@ module Y2Journal
     end
 
     def matches_string
-      @matches_string ||= @matches.join(" ")
+      @matches_string ||= @matches.map(&:shellescape).join(" ")
     end
   end
 end

@@ -95,7 +95,7 @@ describe Y2Journal::Journalctl do
         let(:option) { "value" }
 
         it "assigns the string" do
-          expect(subject).to match(/journalctl --option=\"value\"/)
+          expect(subject).to match(/journalctl --option=value/)
         end
       end
 
@@ -103,7 +103,7 @@ describe Y2Journal::Journalctl do
         let(:option) { -1 }
 
         it "assigns the value as a string" do
-          expect(subject).to match(/journalctl --option=\"-1\"/)
+          expect(subject).to match(/journalctl --option=-1/)
         end
       end
 
@@ -112,7 +112,7 @@ describe Y2Journal::Journalctl do
 
         it "assigns the formatted time" do
           expect(subject)
-            .to match(/journalctl --option=\"2014-01-02 03:04:05\"/)
+            .to match(/journalctl --option=2014-01-02\\ 03:04:05/)
         end
       end
 
@@ -120,8 +120,8 @@ describe Y2Journal::Journalctl do
         let(:option) { ["value", Time.new(2014, 1, 2, 3, 4, 5)] }
 
         it "includes the option as many times as needed" do
-          expect(subject).to include('--option="2014-01-02 03:04:05"')
-          expect(subject).to include('--option="value"')
+          expect(subject).to include('--option=2014-01-02\\ 03:04:05')
+          expect(subject).to include('--option=value')
         end
       end
     end
