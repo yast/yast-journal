@@ -184,7 +184,13 @@ module Y2Journal
     #
     def journalctl_failed(details)
       log.warn "journalctl failed, displaying empty result"
-      Yast2::Popup.show(_("Reading the journal entries failed."), details: details)
+      Yast2::Popup.show(
+        _(
+          "Reading system messages failed.\n\n" \
+          "Only users in the 'systemd-journal' group or user 'root'\n" \
+          "can read all system messages."
+        ), details: details
+      )
     end
   end
 end
