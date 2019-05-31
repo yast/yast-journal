@@ -17,6 +17,7 @@ X-SuSE-YaST-AutoInstResource=
 Icon=yast-journal
 Exec=/sbin/yast2 journal
 
-Name=Systemd Journal
-GenericName=Read systemd journal entries
+Name=YaST Systemd Journal
+GenericName=Systemd Journal
+Comment=Read systemd journal entries
 StartupNotify=true
