@@ -29,7 +29,7 @@ Source0:        %{name}-%{version}.tar.bz2
 BuildRequires:  update-desktop-files
 # Yast::Builtins::strftime
 BuildRequires:  yast2-ruby-bindings >= 3.1.38
-BuildRequires:  yast2-devtools
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2
 #for install task
 BuildRequires:  rubygem(yast-rake)
