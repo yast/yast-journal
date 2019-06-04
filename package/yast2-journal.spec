@@ -55,7 +55,8 @@ user-friendly way.
 %setup -q
 
 %check
-%yast_check
+# Enable UI tests in headless systems like Jenkins
+libyui-terminal rake test:unit
 
 %install
 %yast_install
