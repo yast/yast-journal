@@ -12,27 +12,24 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-journal
-Version:        4.2.0
+Version:        4.2.1
 Release:        0
-BuildArch:      noarch
+Group:          System/YaST
+License:        GPL-2.0 or GPL-3.0
+Url:            https://github.com/yast/yast-journal
+Summary:        YaST2 - Reading of systemd journal
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
-
-# First version with base Dialog class
-Requires:       yast2 >= 3.1.117
-# Yast::Builtins::strftime
-Requires:       yast2-ruby-bindings >= 3.1.38
 
 BuildRequires:  update-desktop-files
 # Yast::Builtins::strftime
 BuildRequires:  yast2-ruby-bindings >= 3.1.38
-BuildRequires:  yast2-devtools
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2
 #for install task
 BuildRequires:  rubygem(yast-rake)
@@ -43,32 +40,33 @@ BuildRequires:  libyui-ncurses >= 2.47.1
 # libyui-terminal
 BuildRequires:  libyui-ncurses-tools
 
-Group:          System/YaST
-License:        GPL-2.0 or GPL-3.0
-Url:            https://github.com/yast/yast-journal
-Summary:        YaST2 - Reading of systemd journal
+# First version with base Dialog class
+Requires:       yast2 >= 3.1.117
+# Yast::Builtins::strftime
+Requires:       yast2-ruby-bindings >= 3.1.38
+
+BuildArch:      noarch
 
 %description
 A YaST2 module to read the systemd journal in a convenient and
 user-friendly way.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %check
-# Enable UI tests in headless systems like Jenkins
-libyui-terminal rake test:unit
+%yast_check
 
 %install
-rake install DESTDIR="%{buildroot}"
+%yast_install
+%yast_metainfo
 
 %files
-%defattr(-,root,root)
-%{yast_dir}/clients/*.rb
-%{yast_dir}/lib
-%{yast_desktopdir}/journal.desktop
+%{yast_clientdir}
+%{yast_libdir}
+%{yast_desktopdir}
+%{yast_metainfodir}
 %{yast_icondir}
-
 %doc COPYING
 %doc README.md
 
