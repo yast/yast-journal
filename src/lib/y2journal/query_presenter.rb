@@ -96,6 +96,11 @@ module Y2Journal
       end
     end
 
+    # Split journalctl timestamp at "—"; localize and return the joined string back
+    def self.localize_timestamp(ts)
+      ts.split("—").map { |t| Yast::Builtins.strftime(::Time.parse(t), "%c") }.join("—")
+    end
+
     # Possible intervals for a QueryPresenter object to be used in forms
     #
     # @return [Array<Hash>] each interval is represented by a hash with two keys
@@ -106,11 +111,11 @@ module Y2Journal
 
       intervals << { value: Hash, label: _("Between these dates") }
 
-      label = _("Since system's boot (%s)") % boots.last[:timestamps]
+      label = _("Since system's boot (%s)") % localize_timestamp(boots.last[:timestamps])
       intervals << { value: "0", label: label }
 
       if boots.size > 1
-        label = _("From previous boot (%s)") % boots[-2][:timestamps]
+        label = _("From previous boot (%s)") % localize_timestamp(boots[-2][:timestamps])
         intervals << { value: "-1", label: label }
       end
 
