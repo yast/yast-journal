@@ -218,12 +218,18 @@ describe Y2Journal::Query do
       expect(subject.first).to eq(
         offset:     "-10",
         id:         "f02631731f744344859a5b7222d815d6",
-        timestamps: "Wed 2014-10-01 21:12:23 CEST—Sun 2014-10-05 20:36:49 CEST"
+        timestamps: {
+          first: ::Time.parse("Wed 2014-10-01 21:12:23 CEST"),
+          last:  ::Time.parse("Sun 2014-10-05 20:36:49 CEST")
+        }
       )
       expect(subject.last).to eq(
         offset:     "0",
         id:         "24a9a89c43d34f859399f7994a233ecf",
-        timestamps: "Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET"
+        timestamps: {
+          first: ::Time.parse("Mon 2015-01-26 19:55:33 CET"),
+          last:  ::Time.parse("Mon 2015-01-26 20:05:16 CET")
+        }
       )
     end
   end
