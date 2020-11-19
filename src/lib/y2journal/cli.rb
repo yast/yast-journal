@@ -19,6 +19,7 @@
 Yast.import "CommandLine"
 
 module Y2Journal
+  # CLI support for journal. It just recommends to run journalctl directly.
   class CLI
     extend Yast::I18n
 

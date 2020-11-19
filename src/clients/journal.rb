@@ -24,4 +24,3 @@ if Yast::WFM.Args.empty?
 else
   Y2Journal::CLI.run
 end
-
