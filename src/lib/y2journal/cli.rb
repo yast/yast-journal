@@ -16,11 +16,27 @@
 #  To contact Novell about this file by physical or electronic mail,
 #  you may find current contact information at www.suse.com
 
-require "y2journal/entries_dialog"
-require "y2journal/cli"
+Yast.import "CommandLine"
 
-if Yast::WFM.Args.empty?
-  Y2Journal::EntriesDialog.run
-else
-  Y2Journal::CLI.run
+module Y2Journal
+  # CLI support for journal. It just recommends to run journalctl directly.
+  class CLI
+    extend Yast::I18n
+
+    def self.run
+      textdomain "journal"
+
+      msg = format(
+        _("Command line is not supported. Use '%s' directly."),
+        "journalctl"
+      )
+
+      cmdline_description = {
+        "id"   => "journal",
+        "help" => msg
+      }
+
+      Yast::CommandLine.Run(cmdline_description)
+    end
+  end
 end
