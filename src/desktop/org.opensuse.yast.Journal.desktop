@@ -15,7 +15,7 @@ X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=
 
 Icon=yast-journal
-Exec=/sbin/yast2 journal
+Exec=/usr/bin/xdg-su -c "/sbin/yast2 journal"
 
 Name=YaST Systemd Journal
 GenericName=Systemd Journal
