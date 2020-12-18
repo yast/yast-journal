@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Dec 18 15:57:56 UTC 2020 - Jens K. <jens@karatek.net>
+
+- Change .desktop file so module launches with xdg-su (bsc#1180173).
+- 4.3.1
+
+-------------------------------------------------------------------
 Thu Nov 19 12:12:33 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
 
 - print properly help to avoid accidental opening of module by bash
