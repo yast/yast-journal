@@ -15,9 +15,8 @@ jobs:
     - name: Git Checkout
       uses: actions/checkout@v2
 
-    # just for easier debugging...
-    - name: Inspect Installed Packages
-      run: rpm -qa | sort
+    - name: Install Dependencies
+      run: rake build_dependencies:install
 
     - name: Unit Tests
       run: rake test:unit
@@ -51,6 +50,13 @@ jobs:
 
     - name: Git Checkout
       uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: rake build_dependencies:install
+
+    # just for easier debugging...
+    - name: Inspect Installed Packages
+      run: rpm -qa | sort
 
     - name: Package Build
       run: yast-ci-ruby -o package
