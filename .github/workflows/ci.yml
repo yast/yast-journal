@@ -19,7 +19,8 @@ jobs:
       run: rake build_dependencies:install
 
     - name: Unit Tests
-      run: rake test:unit
+      # libyui-terminal allows running UI tests in headless systems
+      run: libyui-terminal rake test:unit
       # enable code coverage reporting
       env:
         COVERAGE: 1
