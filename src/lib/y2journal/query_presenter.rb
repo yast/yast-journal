@@ -97,8 +97,13 @@ module Y2Journal
     end
 
     # Split journalctl timestamp at "—"; localize and return the joined string back
-    def self.localize_timestamp(ts)
-      ts.map { |t| Yast::Builtins.strftime(t, "%c") }.join(" to ")
+    def self.localize_timestamp(boot)
+      start_time = boot[:timestamps][:first]
+      end_time   = boot[:timestamps][:last]
+
+      # TRANSLATORS: %<first>s and %<last>s will be replaced by already localized
+      # timestamps indicating when the system booted and when it was shut down
+      _(format("%<first>s to %<last>s", first: start_time, last: end_time))
     end
 
     # Possible intervals for a QueryPresenter object to be used in forms
@@ -112,12 +117,12 @@ module Y2Journal
       intervals << { value: Hash, label: _("Between these dates") }
 
       label = _("Since system's boot (%s)") %
-        localize_timestamp(boots.last[:timestamps].values)
+        localize_timestamp(boots.last)
       intervals << { value: "0", label: label }
 
       if boots.size > 1
         label = _("From previous boot (%s)") %
-          localize_timestamp(boots[-2][:timestamps].values)
+          localize_timestamp(boots[-2])
         intervals << { value: "-1", label: label }
       end
 
