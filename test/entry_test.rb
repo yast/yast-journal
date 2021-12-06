@@ -23,7 +23,7 @@ require "y2journal/entry"
 
 describe Y2Journal::Entry do
   describe ".all" do
-    subject { Y2Journal::Entry.all(args) }
+    subject { Y2Journal::Entry.all(**args) }
 
     describe "journalctl invocation" do
       context "when called with no options or matches" do
