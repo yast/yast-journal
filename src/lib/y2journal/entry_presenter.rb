@@ -52,8 +52,14 @@ module Y2Journal
 
     # Message string
     def message
+      msg = entry.message
       # bnc#941655 was caused by this field being an array in journalctl's json
-      entry.message.to_s
+      # Also big arrays are problematic
+      if msg.is_a?(Array)
+        "[#{msg.size} bytes blob data]"
+      else
+        msg.to_s
+      end
     end
   end
 end
