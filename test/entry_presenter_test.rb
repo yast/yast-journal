@@ -49,7 +49,7 @@ describe Y2Journal::EntryPresenter do
     let(:entry) { Y2Journal::Entry.new(json_for("blob")) }
 
     it "abbreviates array blobs" do
-      expect(subject.message).to match(/bytes blob data/)
+      expect(subject.message).to match(/Blob data/)
     end
   end
 end

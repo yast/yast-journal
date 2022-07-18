@@ -23,9 +23,12 @@ require "yast"
 module Y2Journal
   # Presenter for Entry adding useful methods for the dialogs
   class EntryPresenter < SimpleDelegator
+    include Yast::I18n
+
     TIME_FORMAT = "%b %d %H:%M:%S".freeze
 
     def initialize(entry)
+      textdomain "journal"
       __setobj__(entry)
     end
 
@@ -56,7 +59,8 @@ module Y2Journal
       # bnc#941655 was caused by this field being an array in journalctl's json
       # Also big arrays are problematic
       if msg.is_a?(Array)
-        "[#{msg.size} bytes blob data]"
+        # TRANSLATORS: this describes a non-displayable journal entry
+        format(_("[Blob data (%i bytes)]"), msg.size)
       else
         msg.to_s
       end
