@@ -3,6 +3,7 @@ Mon Jul 18 08:36:08 UTC 2022 - Martin Vidner <mvidner@suse.com>
 
 - Adapt to changed output of journalctl --list-boots,
   avoid Internal Error with systemd-251 (bsc#1201504).
+- Abbreviate numeric array journal entries (bsc#1200613)
 - 4.5.1
 
 -------------------------------------------------------------------
