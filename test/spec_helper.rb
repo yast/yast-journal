@@ -24,6 +24,9 @@ ENV["Y2DIR"] = SRC_PATH
 require "yast"
 require "yast/rspec"
 
+# fail fast if a class does not declare textdomain (bsc#1130822)
+ENV["Y2STRICTTEXTDOMAIN"] = "1"
+
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     # If you misremember a method name both in code and in tests,
