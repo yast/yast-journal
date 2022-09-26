@@ -55,7 +55,7 @@ module Y2Journal
 
     # Decorated entries
     #
-    # @return [Array<EntryPresenter]
+    # @return [Array<EntryPresenter>]
     def entries
       query.entries.map { |entry| EntryPresenter.new(entry) }
     end
@@ -84,11 +84,7 @@ module Y2Journal
       when "-1"
         _("From previous boot")
       when Hash
-        dates = {
-          since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
-          until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
-        }
-        _("Between %{since} and %{until}") % dates
+        self.class.localize_interval(interval)
       when nil
         _("No time restriction")
       else
@@ -96,14 +92,14 @@ module Y2Journal
       end
     end
 
-    # Split journalctl timestamp at "—"; localize and return the joined string back
-    def self.localize_timestamp(boot)
-      start_time = boot[:timestamps][:first]
-      end_time   = boot[:timestamps][:last]
-
-      # TRANSLATORS: %<first>s and %<last>s will be replaced by already localized
-      # timestamps indicating when the system booted and when it was shut down
-      _(format("%<first>s to %<last>s", first: start_time, last: end_time))
+    # @param interval [Hash] :since => time, :until => time
+    # @return [String]
+    def self.localize_interval(interval)
+      dates = {
+        since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
+        until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
+      }
+      _("Between %{since} and %{until}") % dates
     end
 
     # Possible intervals for a QueryPresenter object to be used in forms
@@ -117,12 +113,12 @@ module Y2Journal
       intervals << { value: Hash, label: _("Between these dates") }
 
       label = _("Since system's boot (%s)") %
-        localize_timestamp(boots.last)
+        localize_interval(boots.last[:timestamps])
       intervals << { value: "0", label: label }
 
       if boots.size > 1
         label = _("From previous boot (%s)") %
-          localize_timestamp(boots[-2])
+          localize_interval(boots[-2][:timestamps])
         intervals << { value: "-1", label: label }
       end
 

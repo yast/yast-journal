@@ -85,9 +85,9 @@ module Y2Journal
     #
     # Each boot is represented by a hash with three elements, with all the keys
     # being symbols and all the values being strings.
-    #  * id: 32-character identifier
-    #  * offset: offset relative to the current boot
-    #  * timestamps: timestamps of the first and last message for the boot
+    #  * :id => 32-character identifier
+    #  * :offset => offset relative to the current boot (String)
+    #  * :timestamps: Hash with :since, :until => Time
     def self.boots
       lines = Journalctl.new({ "list-boots" => nil, "quiet" => nil }, []).output.lines
       lines.map do |line|
@@ -100,8 +100,8 @@ module Y2Journal
             id:         Regexp.last_match[2],
             offset:     Regexp.last_match[1],
             timestamps: {
-              first: ::Time.parse(Regexp.last_match[3]),
-              last:  ::Time.parse(Regexp.last_match[4])
+              since: ::Time.parse(Regexp.last_match[3]),
+              until: ::Time.parse(Regexp.last_match[4])
             }
           }
         else
