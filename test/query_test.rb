@@ -49,7 +49,7 @@ describe Y2Journal::Query do
   end
 
   describe "#journalctl_options" do
-    subject { Y2Journal::Query.new(args).journalctl_options }
+    subject { Y2Journal::Query.new(**args).journalctl_options }
 
     context "when both arguments are nil" do
       let(:args) { {} }

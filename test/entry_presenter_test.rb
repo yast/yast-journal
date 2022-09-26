@@ -22,9 +22,9 @@ require "y2journal/entry_presenter"
 
 describe Y2Journal::EntryPresenter do
   let(:entry) { Y2Journal::Entry.new(json_for("nfs")) }
+  subject { Y2Journal::EntryPresenter.new(entry) }
 
   describe "delegation" do
-    subject { Y2Journal::EntryPresenter.new(entry) }
 
     # Just some examples
     [:raw, :uid, :timestamp, :message].each do |method|
@@ -42,6 +42,14 @@ describe Y2Journal::EntryPresenter do
       time = entry.timestamp.strftime("%H:%M:%S")
       expect(subject).to be_a(String)
       expect(subject).to match(time)
+    end
+  end
+
+  describe "#message" do
+    let(:entry) { Y2Journal::Entry.new(json_for("blob")) }
+
+    it "abbreviates array blobs" do
+      expect(subject.message).to match(/Blob data/)
     end
   end
 end

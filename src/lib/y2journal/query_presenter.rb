@@ -43,7 +43,7 @@ module Y2Journal
           filters:  {}
         }
 
-        query = Query.new(query_args)
+        query = Query.new(**query_args)
       end
       __setobj__(query)
     end

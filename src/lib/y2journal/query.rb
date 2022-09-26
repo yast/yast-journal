@@ -89,7 +89,8 @@ module Y2Journal
     #  * offset: offset relative to the current boot
     #  * timestamps: timestamps of the first and last message for the boot
     def self.boots
-      Journalctl.new({ "list-boots" => nil }, []).output.lines.map do |line|
+      lines = Journalctl.new({ "list-boots" => nil, "quiet" => nil }, []).output.lines
+      lines.map do |line|
         # The 'journalctl --list-boots' output looks like this
         # (slightly stripped down, see test/data for full-length examples)
         # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET

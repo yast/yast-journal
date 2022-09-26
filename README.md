@@ -1,9 +1,12 @@
 YaST systemd journal module
 ===========================
 
-[![Travis Build](https://travis-ci.org/yast/yast-journal.svg?branch=master)](https://travis-ci.org/yast/yast-journal)
-[![Coverage Status](https://coveralls.io/repos/yast/yast-journal/badge.svg?branch=master&service=github)](https://coveralls.io/github/yast/yast-journal?branch=master)
-[![Code Climate](https://codeclimate.com/github/yast/yast-journal/badges/gpa.svg)](https://codeclimate.com/github/yast/yast-journal)
+[![Workflow Status](https://github.com/yast/yast-journal/workflows/CI/badge.svg?branch=master)](
+https://github.com/yast/yast-journal/actions?query=branch%3Amaster)
+[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-journal-master)](
+https://ci.opensuse.org/view/Yast/job/yast-yast-journal-master/)
+[![Coverage Status](https://img.shields.io/coveralls/yast/yast-journal.svg)](https://coveralls.io/r/yast/yast-journal?branch=master)
+[![inline docs](http://inch-ci.org/github/yast/yast-journal.svg?branch=master)](http://inch-ci.org/github/yast/yast-journal)
 
 A module for [YaST](http://yast.github.io) to read the systemd journal in a
 user-friendly way.
