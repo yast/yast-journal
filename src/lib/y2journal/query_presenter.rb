@@ -55,7 +55,7 @@ module Y2Journal
 
     # Decorated entries
     #
-    # @return [Array<EntryPresenter]
+    # @return [Array<EntryPresenter>]
     def entries
       query.entries.map { |entry| EntryPresenter.new(entry) }
     end
@@ -84,16 +84,22 @@ module Y2Journal
       when "-1"
         _("From previous boot")
       when Hash
-        dates = {
-          since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
-          until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
-        }
-        _("Between %{since} and %{until}") % dates
+        self.class.localize_interval(interval)
       when nil
         _("No time restriction")
       else
         raise "Unexpected interval value #{interval.inspect}"
       end
+    end
+
+    # @param interval [Hash] :since => time, :until => time
+    # @return [String]
+    def self.localize_interval(interval)
+      dates = {
+        since: Yast::Builtins.strftime(interval[:since], TIME_FORMAT),
+        until: Yast::Builtins.strftime(interval[:until], TIME_FORMAT)
+      }
+      _("Between %{since} and %{until}") % dates
     end
 
     # Possible intervals for a QueryPresenter object to be used in forms
@@ -106,11 +112,13 @@ module Y2Journal
 
       intervals << { value: Hash, label: _("Between these dates") }
 
-      label = _("Since system's boot (%s)") % boots.last[:timestamps]
+      label = _("Since system's boot (%s)") %
+        localize_interval(boots.last[:timestamps])
       intervals << { value: "0", label: label }
 
       if boots.size > 1
-        label = _("From previous boot (%s)") % boots[-2][:timestamps]
+        label = _("From previous boot (%s)") %
+          localize_interval(boots[-2][:timestamps])
         intervals << { value: "-1", label: label }
       end
 

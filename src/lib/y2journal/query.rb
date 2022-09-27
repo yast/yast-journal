@@ -85,9 +85,9 @@ module Y2Journal
     #
     # Each boot is represented by a hash with three elements, with all the keys
     # being symbols and all the values being strings.
-    #  * id: 32-character identifier
-    #  * offset: offset relative to the current boot
-    #  * timestamps: timestamps of the first and last message for the boot
+    #  * :id => 32-character identifier
+    #  * :offset => offset relative to the current boot (String)
+    #  * :timestamps: Hash with :since, :until => Time
     def self.boots
       lines = Journalctl.new({ "list-boots" => nil, "quiet" => nil }, []).output.lines
       lines.map do |line|
@@ -95,11 +95,14 @@ module Y2Journal
         # (slightly stripped down, see test/data for full-length examples)
         # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
         #  0 24a9a83ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
-        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)$/
+        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)—(.+)$/
           {
             id:         Regexp.last_match[2],
             offset:     Regexp.last_match[1],
-            timestamps: Regexp.last_match[3]
+            timestamps: {
+              since: ::Time.parse(Regexp.last_match[3]),
+              until: ::Time.parse(Regexp.last_match[4])
+            }
           }
         else
           raise "Unexpected output for journalctl --list-boots: #{line}"
