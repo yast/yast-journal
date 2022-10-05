@@ -81,6 +81,10 @@ module Y2Journal
         "#{@journalctl_options}, journalctl_matches #{@journalctl_matches}>"
     end
 
+    # four parts: day-of-week date time time-zone
+    TIMESTAMP_RX = /\S+\s+\S+\s+\S+\s\S+/
+    private_constant :TIMESTAMP_RX
+
     # Array of system's boots registered in the journal.
     #
     # Each boot is represented by a hash with three elements, with all the keys
@@ -93,9 +97,9 @@ module Y2Journal
       lines.map do |line|
         # The 'journalctl --list-boots' output looks like this
         # (slightly stripped down, see test/data for full-length examples)
-        # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET—Mon 2015-01-26 19:18:43 CET
-        #  0 24a9a83ecf Mon 2015-01-26 19:55:33 CET—Mon 2015-01-26 20:05:16 CET
-        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(.+)—(.+)$/
+        # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET Mon 2015-01-26 19:18:43 CET
+        #  0 24a9a83ecf Mon 2015-01-26 19:55:33 CET Mon 2015-01-26 20:05:16 CET
+        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(#{TIMESTAMP_RX})[— ](#{TIMESTAMP_RX})$/
           {
             id:         Regexp.last_match[2],
             offset:     Regexp.last_match[1],
