@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep 01 19:57:03 UTC 2023 - Josef Reidinger <jreidinger@suse.com>
+
+- Branch package for SP6 (bsc#1208913)
+
+-------------------------------------------------------------------
 Tue Oct  4 12:53:04 UTC 2022 - Martin Vidner <mvidner@suse.com>
 
 - Fix Internal Error with systemd-251 again, the last change
