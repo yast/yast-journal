@@ -59,7 +59,7 @@ module Y2Journal
 
     # Full journalctl command
     def command
-      "LANG=C /usr/bin/journalctl #{options_string} #{matches_string}".strip.squeeze(" ")
+      "SYSTEMD_COLORS='' LANG=C /usr/bin/journalctl #{options_string} #{matches_string}".strip.squeeze(" ")
     end
 
     # Output resulting of executing the command
