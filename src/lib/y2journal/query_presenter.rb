@@ -33,6 +33,7 @@ module Y2Journal
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(query = nil)
+      super
       textdomain "journal"
 
       if !query

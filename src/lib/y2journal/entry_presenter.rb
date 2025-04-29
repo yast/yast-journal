@@ -30,6 +30,7 @@ module Y2Journal
     TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(entry)
+      super
       textdomain "journal"
       __setobj__(entry)
     end

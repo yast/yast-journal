@@ -53,9 +53,7 @@ module Y2Journal
     # @see Y2Journal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
       unsupported = filters.keys.reject { |k| VALID_FILTERS.include?(k) }
-      if !unsupported.empty?
-        raise "Unexpected filters for the query: #{unsupported.join(", ")}"
-      end
+      raise "Unexpected filters for the query: #{unsupported.join(", ")}" unless unsupported.empty?
 
       @filters = filters
       @interval = interval
@@ -98,6 +96,8 @@ module Y2Journal
     def self.boots
       lines = Journalctl.new({ "list-boots" => nil, "quiet" => nil }, []).output.lines
       lines.map do |line|
+        # rubocop: disable Style/GuardClause
+        #
         # The 'journalctl --list-boots' output looks like this
         # (slightly stripped down, see test/data for full-length examples)
         # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET Mon 2015-01-26 19:18:43 CET
@@ -114,6 +114,7 @@ module Y2Journal
         else
           raise "Unexpected output for journalctl --list-boots: #{line}"
         end
+        # rubocop: enable Style/GuardClause
       end
     end
 
