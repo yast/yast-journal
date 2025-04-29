@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        5.0.1
+Version:        5.0.2
 Release:        0
 Group:          System/YaST
 License:        GPL-2.0 or GPL-3.0

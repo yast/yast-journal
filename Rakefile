@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -20,6 +22,7 @@ require "yast/rake"
 
 Yast::Tasks.configuration do |conf|
   conf.skip_license_check << /test\/data\/*/
+  conf.skip_license_check << /example\/*/
   # Desktop files are just metadata
   conf.skip_license_check << /.*desktop$/
   conf.skip_license_check << /.*svg$/

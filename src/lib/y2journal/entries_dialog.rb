@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -21,7 +23,7 @@ require "ui/dialog"
 require "y2journal/query_presenter"
 require "y2journal/query_dialog"
 require "y2journal/journalctl_exception"
-require "yast2/popup.rb"
+require "yast2/popup"
 
 Yast.import "UI"
 Yast.import "Label"
@@ -78,6 +80,7 @@ module Y2Journal
     # Event callback for the 'change filter' button.
     def filter_handler
       return unless read_query
+
       redraw_query
       execute_query
       redraw_table

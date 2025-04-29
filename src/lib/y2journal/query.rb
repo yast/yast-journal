@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -50,10 +52,9 @@ module Y2Journal
     #   repeated as many times as needed.
     # @see Y2Journal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
-      unsupported = filters.keys.select { |k| !VALID_FILTERS.include?(k) }
-      if !unsupported.empty?
-        raise "Unexpected filters for the query: #{unsupported.join(", ")}"
-      end
+      unsupported = filters.keys.reject { |k| VALID_FILTERS.include?(k) }
+      raise "Unexpected filters for the query: #{unsupported.join(", ")}" unless unsupported.empty?
+
       @filters = filters
       @interval = interval
 
@@ -82,7 +83,7 @@ module Y2Journal
     end
 
     # four parts: day-of-week date time time-zone
-    TIMESTAMP_RX = /\S+\s+\S+\s+\S+\s\S+/
+    TIMESTAMP_RX = /\S+\s+\S+\s+\S+\s\S+/.freeze
     private_constant :TIMESTAMP_RX
 
     # Array of system's boots registered in the journal.
@@ -95,11 +96,13 @@ module Y2Journal
     def self.boots
       lines = Journalctl.new({ "list-boots" => nil, "quiet" => nil }, []).output.lines
       lines.map do |line|
+        # rubocop: disable Style/GuardClause
+        #
         # The 'journalctl --list-boots' output looks like this
         # (slightly stripped down, see test/data for full-length examples)
         # -1 a07ac0f240 Sun 2014-12-14 16:50:09 CET Mon 2015-01-26 19:18:43 CET
         #  0 24a9a83ecf Mon 2015-01-26 19:55:33 CET Mon 2015-01-26 20:05:16 CET
-        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(#{TIMESTAMP_RX})[— ](#{TIMESTAMP_RX})$/
+        if line.strip =~ /^\s*(-*\d+)\s+(\w+)\s+(#{TIMESTAMP_RX})[— ]+(#{TIMESTAMP_RX})$/
           {
             id:         Regexp.last_match[2],
             offset:     Regexp.last_match[1],
@@ -111,6 +114,7 @@ module Y2Journal
         else
           raise "Unexpected output for journalctl --list-boots: #{line}"
         end
+        # rubocop: enable Style/GuardClause
       end
     end
 
@@ -133,7 +137,7 @@ module Y2Journal
         end
       end
       # Remove empty time arguments
-      @journalctl_options.reject! { |_, v| v.nil? }
+      @journalctl_options.compact!
 
       # Add filters...
       @journalctl_options.merge!(@filters)

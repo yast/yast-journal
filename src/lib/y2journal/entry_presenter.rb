@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -25,9 +27,10 @@ module Y2Journal
   class EntryPresenter < SimpleDelegator
     include Yast::I18n
 
-    TIME_FORMAT = "%b %d %H:%M:%S".freeze
+    TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(entry)
+      super
       textdomain "journal"
       __setobj__(entry)
     end

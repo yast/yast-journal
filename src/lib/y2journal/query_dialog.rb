@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -111,6 +113,7 @@ module Y2Journal
         name = filter[:name]
         # Skip if the checkbox is not checked
         next unless Yast::UI.QueryWidget(Id(name), :Value)
+
         # Read the widget...
         value = widget_to_filter(name, filter[:multiple])
         # ...discarding empty values
@@ -246,7 +249,7 @@ module Y2Journal
     def widget_to_filter(name, multiple)
       value = Yast::UI.QueryWidget(Id(:"#{name}_value"), :Value)
       if multiple
-        value.split(" ")
+        value.split
       else
         value
       end
