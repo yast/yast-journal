@@ -3,7 +3,7 @@ Sun Apr 27 11:50:04 UTC 2025 - Stefan Hundhammer <shundhammer@suse.com>
 
 - Fixed regexp for changed 'journalctl --list-boots' output:
   Now taking daylight savings time on/off into account
-  #1241904
+  (bsc#1241904)
 - 5.0.2
 
 -------------------------------------------------------------------
