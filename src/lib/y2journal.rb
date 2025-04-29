@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 # Copyright (c) [2018] SUSE LLC
 #

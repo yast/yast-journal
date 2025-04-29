@@ -1,4 +1,6 @@
 #! /usr/bin/rspec
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -36,7 +38,7 @@ if !ENV["TRAVIS"]
     #   changes.
     def send_user_input(value, pre_hook: nil)
       expect(Yast::UI).to receive(:UserInput) do
-        pre_hook.call if pre_hook
+        pre_hook&.call
         value
       end
     end

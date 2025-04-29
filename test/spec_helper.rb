@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -17,8 +19,8 @@
 #  you may find current contact information at www.suse.com
 
 # Set the paths
-SRC_PATH = File.expand_path("../../src", __FILE__)
-DATA_PATH = File.join(File.expand_path(File.dirname(__FILE__)), "data")
+SRC_PATH = File.expand_path("../src", __dir__)
+DATA_PATH = File.join(__dir__, "data")
 ENV["Y2DIR"] = SRC_PATH
 
 require "yast"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -25,7 +27,7 @@ module Y2Journal
     # Agent used internally
     BASH_SCR_PATH = Yast::Path.new(".target.bash_output")
     # Format understood by journalctl options
-    TIME_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
+    TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
     # Ordered list of priority values supported by journalctl
     PRIORITIES = ["emerg", "alert", "crit", "err",
                   "warning", "notice", "info", "debug"].freeze
@@ -80,6 +82,7 @@ module Y2Journal
 
     def options_string
       return @options_string if @option_string
+
       strings = []
       @options.each_pair do |option, value|
         if value.nil?

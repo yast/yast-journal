@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -28,7 +30,7 @@ module Y2Journal
     extend Yast::I18n
     textdomain "journal"
 
-    TIME_FORMAT = "%b %d %H:%M:%S".freeze
+    TIME_FORMAT = "%b %d %H:%M:%S"
 
     def initialize(query = nil)
       textdomain "journal"
@@ -69,6 +71,7 @@ module Y2Journal
         QueryPresenter.filters.each do |filter|
           value = filters[filter[:name]]
           next if value.nil?
+
           value = value.join(" ") if filter[:multiple]
           descriptions << "#{filter[:label]} (#{value})"
         end
@@ -160,7 +163,7 @@ module Y2Journal
     # Default value for interval[:since]
     def self.default_since
       # 24 hours ago
-      Time.now - 24 * 60 * 60
+      Time.now - (24 * 60 * 60)
     end
 
     # Default value for interval[:until]

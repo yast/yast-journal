@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014 SUSE LLC.
 #  All Rights Reserved.
 
@@ -50,10 +52,11 @@ module Y2Journal
     #   repeated as many times as needed.
     # @see Y2Journal::Journalctl#initialize
     def initialize(interval: nil, filters: {})
-      unsupported = filters.keys.select { |k| !VALID_FILTERS.include?(k) }
+      unsupported = filters.keys.reject { |k| VALID_FILTERS.include?(k) }
       if !unsupported.empty?
         raise "Unexpected filters for the query: #{unsupported.join(", ")}"
       end
+
       @filters = filters
       @interval = interval
 
@@ -82,7 +85,7 @@ module Y2Journal
     end
 
     # four parts: day-of-week date time time-zone
-    TIMESTAMP_RX = /\S+\s+\S+\s+\S+\s\S+/
+    TIMESTAMP_RX = /\S+\s+\S+\s+\S+\s\S+/.freeze
     private_constant :TIMESTAMP_RX
 
     # Array of system's boots registered in the journal.
@@ -133,7 +136,7 @@ module Y2Journal
         end
       end
       # Remove empty time arguments
-      @journalctl_options.reject! { |_, v| v.nil? }
+      @journalctl_options.compact!
 
       # Add filters...
       @journalctl_options.merge!(@filters)
