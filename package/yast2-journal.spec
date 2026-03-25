@@ -17,7 +17,7 @@
 
 
 Name:           yast2-journal
-Version:        5.0.2
+Version:        5.0.3
 Release:        0
 Group:          System/YaST
 License:        GPL-2.0 or GPL-3.0
@@ -26,7 +26,6 @@ Summary:        YaST2 - Reading of systemd journal
 
 Source0:        %{name}-%{version}.tar.bz2
 
-BuildRequires:  update-desktop-files
 # Yast::Builtins::strftime
 BuildRequires:  yast2-ruby-bindings >= 3.1.38
 BuildRequires:  yast2-devtools >= 4.2.2
